@@ -20,11 +20,6 @@ export default function CompanyDetailPage() {
       <ul>
         <li><strong>Industry:</strong> {company.industry || "N/A"}</li>
         <li><strong>Website:</strong> {company.website || "N/A"}</li>
-        <li><strong>Email:</strong> {company.email || "N/A"}</li>
-        <li><strong>Phone:</strong> {company.phone || "N/A"}</li>
-        <li><strong>Address:</strong> {company.address || "N/A"}</li>
-        <li><strong>Country:</strong> {company.country || "N/A"}</li>
-        <li><strong>Employee count:</strong> {company.employeeCount ?? "N/A"}</li>
       </ul>
     </div>
   );
