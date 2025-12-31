@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
-import CompaniesListPage from "./pages/CompaniesListPage";
-import CompanyDetailPage from "./pages/CompanyDetailPage";
-import CompanyForm from "./pages/CompanyForm";
+import CompaniesListPage from "./pages/company/CompaniesListPage";
+import CompanyDetailPage from "./pages/company/CompanyDetailPage";
+import CompanyForm from "./pages/company/CompanyForm";
 
 function App() {
   return (

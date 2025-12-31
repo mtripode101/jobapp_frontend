@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { getCompanyById } from "../services/companyService";
-import { CompanyDto } from "../types/company";
+import { getCompanyById } from "../../services/companyService";
+import { CompanyDto } from "../../types/company";
 
 export default function CompanyDetailPage() {
   const { id } = useParams<{ id: string }>();

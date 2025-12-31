@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createCompany } from "../services/companyService";
-import { CompanyDto } from "../types/company";
+import { createCompany } from "../../services/companyService";
+import { CompanyDto } from "../../types/company";
 
 export default function CompanyForm() {
   const [name, setName] = useState<string>("");
