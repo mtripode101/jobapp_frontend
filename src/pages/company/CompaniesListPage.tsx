@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { getCompanies, deleteCompany } from "../services/companyService";
-import { CompanyDto } from "../types/company";
+import { getCompanies, deleteCompany } from "../../services/companyService";
+import { CompanyDto } from "../../types/company";
 
 export default function CompaniesListPage() {
   const [companies, setCompanies] = useState<CompanyDto[]>([]);
