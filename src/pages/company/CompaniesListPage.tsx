@@ -35,6 +35,9 @@ export default function CompaniesListPage() {
   return (
     <div>
       <h2>Companies</h2>
+
+      {/* 🔗 Link back to Home */}
+      <Link to="/">🏠 Back to Home</Link> |{" "}
       <Link to="/companies/new">➕ Add Company</Link>
 
       {loading && <p>Loading companies...</p>}
