@@ -31,6 +31,9 @@ export default function CandidateListPage() {
   return (
     <div>
       <h2>Candidates</h2>
+
+      {/* 🔗 Link back to Home */}
+      <Link to="/">🏠 Back to Home</Link> |{" "}
       <Link to="/candidates/new">➕ Add Candidate</Link>
 
       {loading && <p>Loading candidates...</p>}
