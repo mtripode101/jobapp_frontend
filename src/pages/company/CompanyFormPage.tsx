@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { createCompany } from "../../services/companyService";
 import { CompanyDto } from "../../types/company";
 
-export default function CompanyForm() {
+export default function CompanyFormPage() {
   const [name, setName] = useState<string>("");
   const [website, setWebsite] = useState<string>("");
-  const [description, setDescription] = useState<string>(""); // opcional
+  const [description, setDescription] = useState<string>(""); // optional
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -55,6 +55,11 @@ export default function CompanyForm() {
       />
 
       <button type="submit">Save</button>
+
+      {/* 🔗 Link back to Companies list */}
+      <div style={{ marginTop: "10px" }}>
+        <Link to="/companies">⬅️ Back to Companies</Link>
+      </div>
     </form>
   );
 }
