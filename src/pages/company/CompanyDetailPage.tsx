@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { getCompanyById } from "../../services/companyService";
 import { CompanyDto } from "../../types/company";
 
@@ -12,7 +12,7 @@ export default function CompanyDetailPage() {
     const companyId = Number(id);
 
     getCompanyById(companyId)
-      .then((data) => setCompany(data)) // ✅ ya devuelve el objeto CompanyDto
+      .then((data) => setCompany(data)) // ✅ returns CompanyDto
       .catch((err) => console.error("Error fetching company:", err));
   }, [id]);
 
@@ -22,10 +22,14 @@ export default function CompanyDetailPage() {
     <div>
       <h2>{company.name}</h2>
       <ul>
-        {/* industry no está en tu DTO, puedes quitarlo o agregarlo en backend */}
         <li><strong>Website:</strong> {company.website || "N/A"}</li>
         <li><strong>Description:</strong> {company.description || "N/A"}</li>
       </ul>
+
+      {/* 🔗 Link back to Companies list */}
+      <div style={{ marginTop: "10px" }}>
+        <Link to="/companies">⬅️ Back to Companies</Link>
+      </div>
     </div>
   );
 }

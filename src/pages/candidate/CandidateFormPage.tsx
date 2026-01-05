@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { createCandidate } from "../../services/candidateService";
 import { CandidateDto } from "../../types/candidate";
 
@@ -50,6 +50,11 @@ export default function CandidateFormPage() {
       />
 
       <button type="submit">Save</button>
+
+      {/* 🔗 Link back to Candidates list */}
+      <div style={{ marginTop: "10px" }}>
+        <Link to="/candidates">⬅️ Back to Candidates</Link>
+      </div>
     </form>
   );
 }
