@@ -14,6 +14,9 @@ import CandidateListPage from "../pages/candidate/CandidateListPage";
 import CandidateDetailPage from "../pages/candidate/CandidateDetailPage";
 import CandidateFormPage from "../pages/candidate/CandidateFormPage";
 
+//Interviews
+import InterviewListPage from "../pages/interview/InterviewListPage";
+
 function AppRoutes() {
   return (
     <Routes>
@@ -30,6 +33,9 @@ function AppRoutes() {
         <Route path="candidates" element={<CandidateListPage />} />
         <Route path="candidates/:id" element={<CandidateDetailPage />} />
         <Route path="candidates/new" element={<CandidateFormPage />} />
+
+        {/* Interviews */}
+        <Route path="interviews" element={<InterviewListPage />} />
 
         {/* 404 */}
         <Route path="*" element={<p>404 - Page Not Found</p>} />

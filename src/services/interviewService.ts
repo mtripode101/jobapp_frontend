@@ -10,16 +10,16 @@ const handleResponse = <T>(promise: Promise<any>): Promise<T> =>
   });
 
 export const getInterviews = (): Promise<InterviewDto[]> =>
-  handleResponse<InterviewDto[]>(axios.get(`${API_URL}/interviews`));    
+  handleResponse<InterviewDto[]>(axios.get(`${API_URL}/interview`));    
 
 export const getInterviewById = (id: number): Promise<InterviewDto> =>
-  handleResponse<InterviewDto>(axios.get(`${API_URL}/interviews/${id}`));   
+  handleResponse<InterviewDto>(axios.get(`${API_URL}/interview/${id}`));   
 
 export const createInterview = (interviewDto: InterviewDto): Promise<InterviewDto> =>
-  handleResponse<InterviewDto>(axios.post(`${API_URL}/interviews`, interviewDto));  
+  handleResponse<InterviewDto>(axios.post(`${API_URL}/interview`, interviewDto));  
 
 export const updateInterview = (id: number, interviewDto: InterviewDto): Promise<InterviewDto> =>
-  handleResponse<InterviewDto>(axios.put(`${API_URL}/interviews/${id}`, interviewDto)); 
+  handleResponse<InterviewDto>(axios.put(`${API_URL}/interview/${id}`, interviewDto)); 
 
 export const deleteInterview = (id: number): Promise<void> =>
-  handleResponse<void>(axios.delete(`${API_URL}/interviews/${id}`));    
+  handleResponse<void>(axios.delete(`${API_URL}/interview/${id}`));    
