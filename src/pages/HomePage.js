@@ -9,6 +9,9 @@ function HomePage() {
         <li><Link to="/companies">Companies</Link></li>
         <li><Link to="/candidates">Candidates</Link></li>
         <li><Link to="/interviews">Interviews</Link></li>
+        <li><Link to="/jobs">Jobs</Link></li>   
+        <li><Link to="/applications">Applications</Link></li> 
+        <li><Link to="/positions">Positions</Link></li>
       </ul>
     </div>
   );
