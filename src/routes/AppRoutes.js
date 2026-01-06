@@ -18,6 +18,15 @@ import CandidateFormPage from "../pages/candidate/CandidateFormPage";
 import InterviewListPage from "../pages/interview/InterviewListPage";
 import InterviewFormPage from "../pages/interview/InterviewFormPage";
 
+//Positions
+import PositionListPage from "../pages/position/PositionListPage";
+
+//Job Applications
+import JobApplicationListPage from "../pages/jobapplication/JobApplicationListPage";
+import JobApplicationDetailPage from "../pages/jobapplication/JobApplicationDetailPage";
+import JobApplicationFormPage from "../pages/jobapplication/JobApplicationFormPage";  
+
+
 function AppRoutes() {
   return (
     <Routes>
@@ -38,6 +47,14 @@ function AppRoutes() {
         {/* Interviews */}
         <Route path="interviews" element={<InterviewListPage />} />
         <Route path="interview/new" element={<InterviewFormPage />} />
+
+        {/* Positions */}
+        <Route path="positions" element={<PositionListPage />} />
+
+        {/* Job Applications */}
+        <Route path="applications" element={<JobApplicationListPage />} />
+        <Route path="applications/new" element={<JobApplicationFormPage />} />
+        <Route path="applications/:id" element={<JobApplicationDetailPage />} />  
 
         {/* 404 */}
         <Route path="*" element={<p>404 - Page Not Found</p>} />

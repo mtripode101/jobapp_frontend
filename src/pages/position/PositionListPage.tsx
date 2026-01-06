@@ -1,0 +1,44 @@
+// src/pages/PositionListPage.tsx
+import React, { useEffect, useState } from "react";
+import { positionService } from "../../services/positionService";
+import { PositionDto } from "../../types/position";
+import { Link } from "react-router-dom";
+
+export default function PositionListPage() {
+  const [positions, setPositions] = useState<PositionDto[]>([]);
+
+  useEffect(() => {
+    positionService.getPositions().then(setPositions);
+  }, []);
+
+  return (
+    <div>
+      <h2>Positions</h2>
+      <Link to="/positions/new">➕ Create Position</Link>
+      <table border={1} style={{ width: "100%", marginTop: "20px" }}>
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Title</th>
+            <th>Location</th>
+            <th>Company</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {positions.map((pos) => (
+            <tr key={pos.id}>
+              <td>{pos.id}</td>
+              <td>{pos.title}</td>
+              <td>{pos.location}</td>
+              <td>{pos.companyName}</td>
+              <td>
+                <Link to={`/positions/${pos.id}`}>🔍 Detail</Link>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+}
