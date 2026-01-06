@@ -15,7 +15,7 @@ export const positionService = {
     handleResponse<PositionDto[]>(axios.get(`${API_URL}/positions`)),
 
   getById: (id: number): Promise<PositionDto> =>
-    handleResponse<PositionDto>(axios.get(`${API_URL}/${id}`)),
+    handleResponse<PositionDto>(axios.get(`${API_URL}/positions/${id}`)),
 
   create: (dto: PositionDto): Promise<PositionDto> =>
     handleResponse<PositionDto>(axios.post(API_URL, dto)),
