@@ -20,11 +20,18 @@ import InterviewFormPage from "../pages/interview/InterviewFormPage";
 
 //Positions
 import PositionListPage from "../pages/position/PositionListPage";
+import PositionDetailPage from "../pages/position/PositionDetailPage";
+import PositionFormPage from "../pages/position/PositionFormPage";
 
 //Job Applications
 import JobApplicationListPage from "../pages/jobapplication/JobApplicationListPage";
 import JobApplicationDetailPage from "../pages/jobapplication/JobApplicationDetailPage";
 import JobApplicationFormPage from "../pages/jobapplication/JobApplicationFormPage";  
+
+//Job Offers
+import JobOfferListPage from "../pages/joboffer/JobOfferListPage";
+import JobOfferDetailPage from "../pages/joboffer/JobOfferDetailPage";
+import JobOfferFormPage from "../pages/joboffer/JobOfferFormPage";
 
 
 function AppRoutes() {
@@ -50,11 +57,18 @@ function AppRoutes() {
 
         {/* Positions */}
         <Route path="positions" element={<PositionListPage />} />
+        <Route path="positions/:id" element={<PositionDetailPage />} />
+        <Route path="positions/new" element={<PositionFormPage />} />
 
         {/* Job Applications */}
         <Route path="applications" element={<JobApplicationListPage />} />
         <Route path="applications/new" element={<JobApplicationFormPage />} />
         <Route path="applications/:id" element={<JobApplicationDetailPage />} />  
+
+        {/* Job Offers */}
+        <Route path="job-offers" element={<JobOfferListPage />} />
+        <Route path="job-offers/:id" element={<JobOfferDetailPage />} />
+        <Route path="job-offers/new" element={<JobOfferFormPage />} />
 
         {/* 404 */}
         <Route path="*" element={<p>404 - Page Not Found</p>} />
