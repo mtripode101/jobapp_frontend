@@ -14,7 +14,11 @@ export default function PositionListPage() {
   return (
     <div>
       <h2>Positions</h2>
+
+      {/* 🔗 Navigation */}
+      <Link to="/">🏠 Back to Home</Link> |{" "}
       <Link to="/positions/new">➕ Create Position</Link>
+
       <table border={1} style={{ width: "100%", marginTop: "20px" }}>
         <thead>
           <tr>
@@ -33,7 +37,8 @@ export default function PositionListPage() {
               <td>{pos.location}</td>
               <td>{pos.companyName}</td>
               <td>
-                <Link to={`/positions/${pos.id}`}>🔍 Detail</Link>
+                <Link to={`/positions/${pos.id}`}>🔍 Detail</Link> |{" "}
+                <Link to={`/positions/${pos.id}/edit`}>✏️ Edit</Link>
               </td>
             </tr>
           ))}

@@ -1,32 +1,74 @@
 // src/pages/JobApplicationFormPage.tsx
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom"; // 👈 Import Link
+import React, { useEffect, useState } from "react";
+import { useNavigate, Link } from "react-router-dom";
 import { jobApplicationService } from "../../services/jobApplicationService";
+import { getCandidates } from "../../services/candidateService";
+import { getCompanies } from "../../services/companyService";
+import { positionService  } from "../../services/positionService";
 import { JobApplicationDto } from "../../types/jobApplicationDto";
+import { CandidateDto } from "../../types/candidate";
+import { CompanyDto } from "../../types/company";
+import { PositionDto } from "../../types/position";
+
+const EMPTY_CANDIDATE: CandidateDto = {
+  id: 0,
+  fullName: "",
+  contactInfo: { email: "", phone: "", linkedIn: "", github: "" },
+};
+
+const EMPTY_COMPANY: CompanyDto = {
+  id: 0,
+  name: "",
+  website: "",
+  description: "",
+};
+
+const EMPTY_POSITION: PositionDto = {
+  id: 0,
+  title: "",
+  location: "",
+  description: "",
+  companyName: "",
+};
 
 export default function JobApplicationFormPage() {
   const [formData, setFormData] = useState<JobApplicationDto>({
     sourceLink: "",
     websiteSource: "",
     description: "",
-    candidate: {
-      fullName: "",
-      contactInfo: {
-        email: "",
-        phone: "",
-        linkedIn: "",
-        github: "",
-      },
-    },
-    company: { name: "", website: "", description: "" },
-    position: { title: "", location: "", description: "", companyName: "" },
+    candidate: EMPTY_CANDIDATE,
+    company: EMPTY_COMPANY,
+    position: EMPTY_POSITION,
     status: "APPLIED",
   });
 
+  const [candidates, setCandidates] = useState<CandidateDto[]>([]);
+  const [companies, setCompanies] = useState<CompanyDto[]>([]);
+  const [positions, setPositions] = useState<PositionDto[]>([]);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    getCandidates().then(setCandidates).catch(() => alert("Failed to load candidates"));
+    getCompanies().then(setCompanies).catch(() => alert("Failed to load companies"));
+    positionService.getPositions().then(setPositions).catch(() => alert("Failed to load positions")); // ✅ use method
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.candidate?.id || formData.candidate.id === 0) {
+      alert("Please select a candidate.");
+      return;
+    }
+    if (!formData.company?.id || formData.company.id === 0) {
+      alert("Please select a company.");
+      return;
+    }
+    if (!formData.position?.id || formData.position.id === 0) {
+      alert("Please select a position.");
+      return;
+    }
+
     jobApplicationService.create(formData).then(() => {
       alert("Application created successfully!");
       navigate("/applications");
@@ -37,7 +79,7 @@ export default function JobApplicationFormPage() {
     <div>
       <h2>Create Job Application</h2>
       <form onSubmit={handleSubmit}>
-        {/* 🔗 Source info */}
+        {/* Source info */}
         <div>
           <label>Source Link:</label>
           <input
@@ -63,133 +105,67 @@ export default function JobApplicationFormPage() {
           />
         </div>
 
-        {/* 🔗 Candidate info */}
+        {/* Candidate selection */}
         <div>
-          <label>Candidate Name:</label>
-          <input
-            type="text"
-            value={formData.candidate.fullName}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                candidate: { ...formData.candidate, fullName: e.target.value },
-              })
-            }
-          />
-        </div>
-        <div>
-          <label>Candidate Email:</label>
-          <input
-            type="email"
-            value={formData.candidate.contactInfo.email}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                candidate: {
-                  ...formData.candidate,
-                  contactInfo: { ...formData.candidate.contactInfo, email: e.target.value },
-                },
-              })
-            }
-          />
-        </div>
-        <div>
-          <label>Candidate Phone:</label>
-          <input
-            type="tel"
-            value={formData.candidate.contactInfo.phone}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                candidate: {
-                  ...formData.candidate,
-                  contactInfo: { ...formData.candidate.contactInfo, phone: e.target.value },
-                },
-              })
-            }
-          />
-        </div>
-        <div>
-          <label>Candidate LinkedIn:</label>
-          <input
-            type="url"
-            value={formData.candidate.contactInfo.linkedIn}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                candidate: {
-                  ...formData.candidate,
-                  contactInfo: { ...formData.candidate.contactInfo, linkedIn: e.target.value },
-                },
-              })
-            }
-          />
-        </div>
-        <div>
-          <label>Candidate GitHub:</label>
-          <input
-            type="url"
-            value={formData.candidate.contactInfo.github}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                candidate: {
-                  ...formData.candidate,
-                  contactInfo: { ...formData.candidate.contactInfo, github: e.target.value },
-                },
-              })
-            }
-          />
+          <label>Select Candidate:</label>
+          <select
+            value={formData.candidate?.id || ""}
+            onChange={(e) => {
+              const selected = candidates.find((c) => c.id === Number(e.target.value));
+              setFormData({ ...formData, candidate: selected || EMPTY_CANDIDATE });
+            }}
+            required
+          >
+            <option value="">-- Choose a candidate --</option>
+            {candidates.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.fullName} ({c.contactInfo?.email})
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* 🔗 Company info */}
+        {/* Company selection */}
         <div>
-          <label>Company Name:</label>
-          <input
-            type="text"
-            value={formData.company.name}
-            onChange={(e) =>
-              setFormData({ ...formData, company: { ...formData.company, name: e.target.value } })
-            }
-          />
-        </div>
-        <div>
-          <label>Company Website:</label>
-          <input
-            type="text"
-            value={formData.company.website}
-            onChange={(e) =>
-              setFormData({ ...formData, company: { ...formData.company, website: e.target.value } })
-            }
-          />
+          <label>Select Company:</label>
+          <select
+            value={formData.company?.id || ""}
+            onChange={(e) => {
+              const selected = companies.find((c) => c.id === Number(e.target.value));
+              setFormData({ ...formData, company: selected || EMPTY_COMPANY });
+            }}
+            required
+          >
+            <option value="">-- Choose a company --</option>
+            {companies.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name} ({c.website})
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* 🔗 Position info */}
+        {/* Position selection */}
         <div>
-          <label>Position Title:</label>
-          <input
-            type="text"
-            value={formData.position.title}
-            onChange={(e) =>
-              setFormData({ ...formData, position: { ...formData.position, title: e.target.value } })
-            }
-          />
-        </div>
-        <div>
-          <label>Position Location:</label>
-          <input
-            type="text"
-            value={formData.position.location}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                position: { ...formData.position, location: e.target.value },
-              })
-            }
-          />
+          <label>Select Position:</label>
+          <select
+            value={formData.position?.id || ""}
+            onChange={(e) => {
+              const selected = positions.find((p) => p.id === Number(e.target.value));
+              setFormData({ ...formData, position: selected || EMPTY_POSITION });
+            }}
+            required
+          >
+            <option value="">-- Choose a position --</option>
+            {positions.map((p) => (
+              <option key={p.id} value={p.id}>
+                {p.title} - {p.companyName} ({p.location})
+              </option>
+            ))}
+          </select>
         </div>
 
-        {/* 🔗 Status */}
+        {/* Status */}
         <div>
           <label>Status:</label>
           <select
@@ -208,7 +184,7 @@ export default function JobApplicationFormPage() {
         <button type="submit">Save Application</button>
       </form>
 
-      {/* 🔙 Back to Applications List */}
+      {/* Back to Applications List */}
       <div style={{ marginTop: "10px" }}>
         <Link to="/applications">⬅️ Back to Applications List</Link>
       </div>
