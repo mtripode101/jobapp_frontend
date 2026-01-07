@@ -7,12 +7,23 @@ export default function CandidateFormPage() {
   const [fullName, setFullName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [phone, setPhone] = useState<string>("");
+  const [linkedIn, setLinkedIn] = useState<string>("");
+  const [github, setGithub] = useState<string>("");
+
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    const newCandidate: CandidateDto = { fullName, email, phone };
+    const newCandidate: CandidateDto = {
+      fullName,
+      contactInfo: {
+        email,
+        phone,
+        linkedIn,
+        github,
+      },
+    };
 
     createCandidate(newCandidate)
       .then(() => navigate("/candidates"))
@@ -47,6 +58,20 @@ export default function CandidateFormPage() {
         placeholder="Phone"
         value={phone}
         onChange={(e) => setPhone(e.target.value)}
+      />
+
+      <input
+        type="url"
+        placeholder="LinkedIn profile"
+        value={linkedIn}
+        onChange={(e) => setLinkedIn(e.target.value)}
+      />
+
+      <input
+        type="url"
+        placeholder="GitHub profile"
+        value={github}
+        onChange={(e) => setGithub(e.target.value)}
       />
 
       <button type="submit">Save</button>

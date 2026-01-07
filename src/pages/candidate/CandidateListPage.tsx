@@ -40,18 +40,56 @@ export default function CandidateListPage() {
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       {!loading && !error && (
-        <ul>
-          {candidates.length === 0 ? (
-            <li>No candidates found</li>
-          ) : (
-            candidates.map((c) => (
-              <li key={c.id}>
-                <Link to={`/candidates/${c.id}`}>{c.fullName}</Link>
-                <button onClick={() => handleDelete(c.id!)}>🗑️ Delete</button>
-              </li>
-            ))
-          )}
-        </ul>
+        <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "10px" }}>
+          <thead>
+            <tr>
+              <th style={{ borderBottom: "1px solid #ccc" }}>Name</th>
+              <th style={{ borderBottom: "1px solid #ccc" }}>Email</th>
+              <th style={{ borderBottom: "1px solid #ccc" }}>Phone</th>
+              <th style={{ borderBottom: "1px solid #ccc" }}>LinkedIn</th>
+              <th style={{ borderBottom: "1px solid #ccc" }}>GitHub</th>
+              <th style={{ borderBottom: "1px solid #ccc" }}>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            {candidates.length === 0 ? (
+              <tr>
+                <td colSpan={6}>No candidates found</td>
+              </tr>
+            ) : (
+              candidates.map((c) => (
+                <tr key={c.id}>
+                  <td>
+                    <Link to={`/candidates/${c.id}`}>{c.fullName}</Link>
+                  </td>
+                  <td>{c.contactInfo?.email || "N/A"}</td>
+                  <td>{c.contactInfo?.phone || "N/A"}</td>
+                  <td>
+                    {c.contactInfo?.linkedIn ? (
+                      <a href={c.contactInfo.linkedIn} target="_blank" rel="noopener noreferrer">
+                        LinkedIn
+                      </a>
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
+                  <td>
+                    {c.contactInfo?.github ? (
+                      <a href={c.contactInfo.github} target="_blank" rel="noopener noreferrer">
+                        GitHub
+                      </a>
+                    ) : (
+                      "N/A"
+                    )}
+                  </td>
+                  <td>
+                    <button onClick={() => handleDelete(c.id!)}>🗑️ Delete</button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       )}
     </div>
   );

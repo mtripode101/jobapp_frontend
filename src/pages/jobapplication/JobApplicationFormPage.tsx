@@ -1,6 +1,6 @@
 // src/pages/JobApplicationFormPage.tsx
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom"; // 👈 Import Link
 import { jobApplicationService } from "../../services/jobApplicationService";
 import { JobApplicationDto } from "../../types/jobApplicationDto";
 
@@ -9,11 +9,20 @@ export default function JobApplicationFormPage() {
     sourceLink: "",
     websiteSource: "",
     description: "",
-    candidate: { fullName: "", email: "" },
+    candidate: {
+      fullName: "",
+      contactInfo: {
+        email: "",
+        phone: "",
+        linkedIn: "",
+        github: "",
+      },
+    },
     company: { name: "", website: "", description: "" },
     position: { title: "", location: "", description: "", companyName: "" },
     status: "APPLIED",
   });
+
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -28,6 +37,7 @@ export default function JobApplicationFormPage() {
     <div>
       <h2>Create Job Application</h2>
       <form onSubmit={handleSubmit}>
+        {/* 🔗 Source info */}
         <div>
           <label>Source Link:</label>
           <input
@@ -52,13 +62,18 @@ export default function JobApplicationFormPage() {
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           />
         </div>
+
+        {/* 🔗 Candidate info */}
         <div>
           <label>Candidate Name:</label>
           <input
             type="text"
             value={formData.candidate.fullName}
             onChange={(e) =>
-              setFormData({ ...formData, candidate: { ...formData.candidate, fullName: e.target.value } })
+              setFormData({
+                ...formData,
+                candidate: { ...formData.candidate, fullName: e.target.value },
+              })
             }
           />
         </div>
@@ -66,12 +81,68 @@ export default function JobApplicationFormPage() {
           <label>Candidate Email:</label>
           <input
             type="email"
-            value={formData.candidate.email}
+            value={formData.candidate.contactInfo.email}
             onChange={(e) =>
-              setFormData({ ...formData, candidate: { ...formData.candidate, email: e.target.value } })
+              setFormData({
+                ...formData,
+                candidate: {
+                  ...formData.candidate,
+                  contactInfo: { ...formData.candidate.contactInfo, email: e.target.value },
+                },
+              })
             }
           />
         </div>
+        <div>
+          <label>Candidate Phone:</label>
+          <input
+            type="tel"
+            value={formData.candidate.contactInfo.phone}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                candidate: {
+                  ...formData.candidate,
+                  contactInfo: { ...formData.candidate.contactInfo, phone: e.target.value },
+                },
+              })
+            }
+          />
+        </div>
+        <div>
+          <label>Candidate LinkedIn:</label>
+          <input
+            type="url"
+            value={formData.candidate.contactInfo.linkedIn}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                candidate: {
+                  ...formData.candidate,
+                  contactInfo: { ...formData.candidate.contactInfo, linkedIn: e.target.value },
+                },
+              })
+            }
+          />
+        </div>
+        <div>
+          <label>Candidate GitHub:</label>
+          <input
+            type="url"
+            value={formData.candidate.contactInfo.github}
+            onChange={(e) =>
+              setFormData({
+                ...formData,
+                candidate: {
+                  ...formData.candidate,
+                  contactInfo: { ...formData.candidate.contactInfo, github: e.target.value },
+                },
+              })
+            }
+          />
+        </div>
+
+        {/* 🔗 Company info */}
         <div>
           <label>Company Name:</label>
           <input
@@ -92,6 +163,8 @@ export default function JobApplicationFormPage() {
             }
           />
         </div>
+
+        {/* 🔗 Position info */}
         <div>
           <label>Position Title:</label>
           <input
@@ -108,15 +181,22 @@ export default function JobApplicationFormPage() {
             type="text"
             value={formData.position.location}
             onChange={(e) =>
-              setFormData({ ...formData, position: { ...formData.position, location: e.target.value } })
+              setFormData({
+                ...formData,
+                position: { ...formData.position, location: e.target.value },
+              })
             }
           />
         </div>
+
+        {/* 🔗 Status */}
         <div>
           <label>Status:</label>
           <select
             value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value as JobApplicationDto["status"] })}
+            onChange={(e) =>
+              setFormData({ ...formData, status: e.target.value as JobApplicationDto["status"] })
+            }
           >
             <option value="APPLIED">Applied</option>
             <option value="REJECTED">Rejected</option>
@@ -124,8 +204,14 @@ export default function JobApplicationFormPage() {
             <option value="OFFERED">Offered</option>
           </select>
         </div>
+
         <button type="submit">Save Application</button>
       </form>
+
+      {/* 🔙 Back to Applications List */}
+      <div style={{ marginTop: "10px" }}>
+        <Link to="/applications">⬅️ Back to Applications List</Link>
+      </div>
     </div>
   );
 }

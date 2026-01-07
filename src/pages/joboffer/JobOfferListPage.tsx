@@ -14,7 +14,11 @@ export default function JobOfferListPage() {
   return (
     <div>
       <h2>Job Offers</h2>
+
+      {/* 🔗 Link back to Home */}
+      <Link to="/">🏠 Back to Home</Link> |{" "}
       <Link to="/job-offers/new">➕ Create Offer</Link>
+
       <table border={1} style={{ width: "100%", marginTop: "20px" }}>
         <thead>
           <tr>

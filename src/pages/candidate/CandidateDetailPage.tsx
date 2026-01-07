@@ -20,8 +20,10 @@ export default function CandidateDetailPage() {
     <div>
       <h2>{candidate.fullName}</h2>
       <ul>
-        <li><strong>Email:</strong> {candidate.email || "N/A"}</li>
-        <li><strong>Phone:</strong> {candidate.phone || "N/A"}</li>
+        <li><strong>Email:</strong> {candidate.contactInfo?.email || "N/A"}</li>
+        <li><strong>Phone:</strong> {candidate.contactInfo?.phone || "N/A"}</li>
+        <li><strong>LinkedIn:</strong> {candidate.contactInfo?.linkedIn || "N/A"}</li>
+        <li><strong>GitHub:</strong> {candidate.contactInfo?.github || "N/A"}</li>
       </ul>
 
       {/* 🔗 Link back to Candidates list */}
