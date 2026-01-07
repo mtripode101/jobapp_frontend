@@ -22,6 +22,7 @@ import InterviewFormPage from "../pages/interview/InterviewFormPage";
 import PositionListPage from "../pages/position/PositionListPage";
 import PositionDetailPage from "../pages/position/PositionDetailPage";
 import PositionFormPage from "../pages/position/PositionFormPage";
+import PositionEditPage from "../pages/position/PositionEditPage";
 
 //Job Applications
 import JobApplicationListPage from "../pages/jobapplication/JobApplicationListPage";
@@ -59,6 +60,7 @@ function AppRoutes() {
         <Route path="positions" element={<PositionListPage />} />
         <Route path="positions/:id" element={<PositionDetailPage />} />
         <Route path="positions/new" element={<PositionFormPage />} />
+        <Route path="positions/:id/edit" element={<PositionEditPage />} />
 
         {/* Job Applications */}
         <Route path="applications" element={<JobApplicationListPage />} />

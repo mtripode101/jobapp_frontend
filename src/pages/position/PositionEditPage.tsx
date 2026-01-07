@@ -1,11 +1,13 @@
-// src/pages/PositionFormPage.tsx
-import React, { useState } from "react";
-import { useNavigate, Link } from "react-router-dom"; // 👈 Import Link
+// src/pages/PositionEditPage.tsx
+import React, { useEffect, useState } from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { positionService } from "../../services/positionService";
 import { PositionDto } from "../../types/position";
 
-export default function PositionFormPage() {
+export default function PositionEditPage() {
+  const { id } = useParams<{ id: string }>();
   const [formData, setFormData] = useState<PositionDto>({
+    id: 0,
     title: "",
     location: "",
     description: "",
@@ -13,17 +15,25 @@ export default function PositionFormPage() {
   });
   const navigate = useNavigate();
 
+  useEffect(() => {
+    if (id) {
+      positionService.getById(Number(id)).then((pos) => setFormData(pos));
+    }
+  }, [id]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    positionService.create(formData).then(() => {
-      alert("Position created successfully!");
+    if (!id) return;
+
+    positionService.update(Number(id), formData).then(() => {
+      alert("Position updated successfully!");
       navigate("/positions");
     });
   };
 
   return (
     <div>
-      <h2>Create Position</h2>
+      <h2>Edit Position</h2>
       <form onSubmit={handleSubmit}>
         <div>
           <label>Title:</label>
@@ -57,7 +67,7 @@ export default function PositionFormPage() {
             onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           />
         </div>
-        <button type="submit">Save Position</button>
+        <button type="submit">Update Position</button>
       </form>
 
       {/* 🔙 Back to Positions List */}
