@@ -14,7 +14,11 @@ export default function JobApplicationListPage() {
   return (
     <div>
       <h2>Job Applications</h2>
+
+      {/* 🔗 Navigation */}
+      <Link to="/">🏠 Back to Home</Link> |{" "}
       <Link to="/applications/new">➕ Create Application</Link>
+
       <table border={1} style={{ width: "100%", marginTop: "20px" }}>
         <thead>
           <tr>

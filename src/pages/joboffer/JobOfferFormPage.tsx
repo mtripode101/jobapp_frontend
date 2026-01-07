@@ -49,6 +49,11 @@ export default function JobOfferFormPage() {
         </div>
         <button type="submit">Save Offer</button>
       </form>
+
+      {/* 🔙 Back to previous page */}
+      <div style={{ marginTop: "10px" }}>
+        <button onClick={() => navigate(-1)}>⬅️ Back to Previous Page</button>
+      </div>
     </div>
   );
 }
