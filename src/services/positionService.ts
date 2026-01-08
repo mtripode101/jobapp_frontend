@@ -18,7 +18,7 @@ export const positionService = {
     handleResponse<PositionDto>(axios.get(`${API_URL}/positions/${id}`)),
 
   create: (dto: PositionDto): Promise<PositionDto> =>
-    handleResponse<PositionDto>(axios.post(API_URL, dto)),
+    handleResponse<PositionDto>(axios.post(`${API_URL}/positions`, dto)),
 
   update: (id: number, dto: PositionDto): Promise<PositionDto> =>
     handleResponse<PositionDto>(axios.put(`${API_URL}/positions/${id}`, dto)),
@@ -30,13 +30,13 @@ export const positionService = {
     handleResponse<PositionDto[]>(axios.get(`${API_URL}/positions/title?title=${title}`)),
 
   findByTitleContaining: (keyword: string): Promise<PositionDto[]> =>
-    handleResponse<PositionDto[]>(axios.get(`${API_URL}/title/contains?keyword=${keyword}`)),
+    handleResponse<PositionDto[]>(axios.get(`${API_URL}/positions/title/contains?keyword=${keyword}`)),
 
   findByLocation: (location: string): Promise<PositionDto[]> =>
     handleResponse<PositionDto[]>(axios.get(`${API_URL}/positions/location?location=${location}`)),
 
   findByCompanyName: (companyName: string): Promise<PositionDto[]> =>
-    handleResponse<PositionDto[]>(axios.get(`${API_URL}/company?companyName=${companyName}`)),
+    handleResponse<PositionDto[]>(axios.get(`${API_URL}/positions/company?companyName=${companyName}`)),
 
   findWithApplications: (): Promise<PositionDto[]> =>
     handleResponse<PositionDto[]>(axios.get(`${API_URL}/positions/with-applications`)),

@@ -11,6 +11,13 @@ export default function PositionListPage() {
     positionService.getPositions().then(setPositions);
   }, []);
 
+  const handleDelete = async (id: number) => {
+    if (window.confirm("Are you sure you want to delete this position?")) {
+      await positionService.delete(id);
+      setPositions((prev) => prev.filter((p) => p.id !== id));
+    }
+  };
+
   return (
     <div>
       <h2>Positions</h2>
@@ -38,7 +45,13 @@ export default function PositionListPage() {
               <td>{pos.companyName}</td>
               <td>
                 <Link to={`/positions/${pos.id}`}>🔍 Detail</Link> |{" "}
-                <Link to={`/positions/${pos.id}/edit`}>✏️ Edit</Link>
+                <Link to={`/positions/${pos.id}/edit`}>✏️ Edit</Link> |{" "}
+                <button
+                  onClick={() => handleDelete(pos.id!)}
+                  style={{ color: "red", cursor: "pointer" }}
+                >
+                  🗑️ Delete
+                </button>
               </td>
             </tr>
           ))}
