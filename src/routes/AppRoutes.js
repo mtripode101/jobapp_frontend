@@ -14,6 +14,7 @@ import CompanyEditPage from "../pages/company/EditCompanyPage";
 import CandidateListPage from "../pages/candidate/CandidateListPage";
 import CandidateDetailPage from "../pages/candidate/CandidateDetailPage";
 import CandidateFormPage from "../pages/candidate/CandidateFormPage";
+import CandidateEditPage from "../pages/candidate/EditCandidatePage";
 
 //Interviews
 import InterviewListPage from "../pages/interview/InterviewListPage";
@@ -53,6 +54,7 @@ function AppRoutes() {
         <Route path="candidates" element={<CandidateListPage />} />
         <Route path="candidates/:id" element={<CandidateDetailPage />} />
         <Route path="candidates/new" element={<CandidateFormPage />} />
+        <Route path="candidates/:id/edit" element={<CandidateEditPage />} /> 
 
         {/* Interviews */}
         <Route path="interviews" element={<InterviewListPage />} />

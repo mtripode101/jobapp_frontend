@@ -1,17 +1,13 @@
+// src/types/candidate.ts
 import { BaseDto } from "./baseDto";
 
 /**
- * Candidate DTO aligned with backend.
- * Extends BaseDto to include id, createdAt, updatedAt.
+ * Candidate DTO aligned with backend (flat fields).
  */
-export interface ContactInfoDto {
-  email: string;
-  phone?: string;      // optional
-  linkedIn?: string;   // optional
-  github?: string;     // optional
-}
-
 export interface CandidateDto extends BaseDto {
   fullName: string;
-  contactInfo: ContactInfoDto;
+  email: string;
+  phone?: string;
+  linkedIn?: string;
+  github?: string;
 }

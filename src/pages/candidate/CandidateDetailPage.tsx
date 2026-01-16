@@ -6,27 +6,40 @@ import { CandidateDto } from "../../types/candidate";
 export default function CandidateDetailPage() {
   const { id } = useParams<{ id: string }>();
   const [candidate, setCandidate] = useState<CandidateDto | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
-    getCandidateById(Number(id))
-      .then((data) => setCandidate(data))
-      .catch((err) => console.error("Error fetching candidate:", err));
+    const candidateId = Number(id);
+    if (isNaN(candidateId)) {
+      setError("Invalid id");
+      setLoading(false);
+      return;
+    }
+    let cancelled = false;
+    setLoading(true);
+    getCandidateById(candidateId)
+      .then((data) => { if (!cancelled) setCandidate(data); })
+      .catch((err) => { if (!cancelled) setError(err?.message || "Error fetching candidate"); })
+      .finally(() => { if (!cancelled) setLoading(false); });
+    return () => { cancelled = true; };
   }, [id]);
 
-  if (!candidate) return <p>Loading...</p>;
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p style={{ color: "red" }}>{error}</p>;
+  if (!candidate) return <p>Candidate not found</p>;
 
   return (
     <div>
       <h2>{candidate.fullName}</h2>
       <ul>
-        <li><strong>Email:</strong> {candidate.contactInfo?.email || "N/A"}</li>
-        <li><strong>Phone:</strong> {candidate.contactInfo?.phone || "N/A"}</li>
-        <li><strong>LinkedIn:</strong> {candidate.contactInfo?.linkedIn || "N/A"}</li>
-        <li><strong>GitHub:</strong> {candidate.contactInfo?.github || "N/A"}</li>
+        <li><strong>Email:</strong> {candidate.email || "N/A"}</li>
+        <li><strong>Phone:</strong> {candidate.phone || "N/A"}</li>
+        <li><strong>LinkedIn:</strong> {candidate.linkedIn || "N/A"}</li>
+        <li><strong>GitHub:</strong> {candidate.github || "N/A"}</li>
       </ul>
 
-      {/* 🔗 Link back to Candidates list */}
       <div style={{ marginTop: "10px" }}>
         <Link to="/candidates">⬅️ Back to Candidates</Link>
       </div>
