@@ -7,83 +7,106 @@ export default function CandidateListPage() {
   const [candidates, setCandidates] = useState<CandidateDto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [deletingIds, setDeletingIds] = useState<Record<number, boolean>>({});
+
+  const clearMessages = () => {
+    setTimeout(() => {
+      setError(null);
+      setSuccessMessage(null);
+    }, 4000);
+  };
 
   const loadCandidates = useCallback(() => {
+    let cancelled = false;
     setLoading(true);
     setError(null);
+
     getCandidates()
-      .then((data) => setCandidates(data))
-      .catch(() => setError("Failed to load candidates"))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (cancelled) return;
+        if (Array.isArray(data)) setCandidates(data);
+        else if ((data as any)?.content) setCandidates((data as any).content);
+        else setCandidates([]);
+      })
+      .catch((err: any) => {
+        if (cancelled) return;
+        setError(err?.message || "Failed to load candidates");
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+
+    return () => { cancelled = true; };
   }, []);
 
   useEffect(() => {
-    loadCandidates();
+    const cleanup = loadCandidates();
+    return cleanup;
   }, [loadCandidates]);
 
-  const handleDelete = (id: number) => {
+  const handleDelete = async (id: number) => {
     if (!window.confirm("Are you sure you want to delete this candidate?")) return;
-    deleteCandidate(id)
-      .then(() => loadCandidates())
-      .catch(() => setError("Failed to delete candidate"));
+    setDeletingIds((s) => ({ ...s, [id]: true }));
+    const previous = candidates;
+    setCandidates((prev) => prev.filter((c) => c.id !== id));
+
+    try {
+      await deleteCandidate(id);
+      setSuccessMessage("Candidate deleted successfully");
+      clearMessages();
+    } catch (err: any) {
+      setCandidates(previous);
+      setError(err?.message || "Failed to delete candidate");
+      clearMessages();
+    } finally {
+      setDeletingIds((s) => { const copy = { ...s }; delete copy[id]; return copy; });
+    }
   };
 
   return (
     <div>
       <h2>Candidates</h2>
+      <div style={{ marginBottom: 12 }}>
+        <Link to="/">🏠 Back to Home</Link> | <Link to="/candidates/new">➕ Add Candidate</Link>
+      </div>
 
-      {/* 🔗 Link back to Home */}
-      <Link to="/">🏠 Back to Home</Link> |{" "}
-      <Link to="/candidates/new">➕ Add Candidate</Link>
-
-      {loading && <p>Loading candidates...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {loading && <p role="status">Loading candidates...</p>}
+      {error && <p role="alert" style={{ color: "red" }}>{error}</p>}
+      {successMessage && <p role="status" style={{ color: "green" }}>{successMessage}</p>}
 
       {!loading && !error && (
         <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "10px" }}>
           <thead>
             <tr>
-              <th style={{ borderBottom: "1px solid #ccc" }}>Name</th>
-              <th style={{ borderBottom: "1px solid #ccc" }}>Email</th>
-              <th style={{ borderBottom: "1px solid #ccc" }}>Phone</th>
-              <th style={{ borderBottom: "1px solid #ccc" }}>LinkedIn</th>
-              <th style={{ borderBottom: "1px solid #ccc" }}>GitHub</th>
-              <th style={{ borderBottom: "1px solid #ccc" }}>Actions</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left", padding: 8 }}>Name</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left", padding: 8 }}>Email</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left", padding: 8 }}>Phone</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left", padding: 8 }}>LinkedIn</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left", padding: 8 }}>GitHub</th>
+              <th style={{ borderBottom: "1px solid #ccc", textAlign: "left", padding: 8 }}>Actions</th>
             </tr>
           </thead>
           <tbody>
             {candidates.length === 0 ? (
-              <tr>
-                <td colSpan={6}>No candidates found</td>
-              </tr>
+              <tr><td colSpan={6} style={{ padding: 8 }}>No candidates found</td></tr>
             ) : (
               candidates.map((c) => (
                 <tr key={c.id}>
-                  <td>
-                    <Link to={`/candidates/${c.id}`}>{c.fullName}</Link>
+                  <td style={{ padding: 8 }}><Link to={`/candidates/${c.id}`}>{c.fullName}</Link></td>
+                  <td style={{ padding: 8 }}>{c.email || "N/A"}</td>
+                  <td style={{ padding: 8 }}>{c.phone || "N/A"}</td>
+                  <td style={{ padding: 8 }}>
+                    {c.linkedIn ? <a href={c.linkedIn} target="_blank" rel="noopener noreferrer">LinkedIn</a> : "N/A"}
                   </td>
-                  <td>{c.contactInfo?.email || "N/A"}</td>
-                  <td>{c.contactInfo?.phone || "N/A"}</td>
-                  <td>
-                    {c.contactInfo?.linkedIn ? (
-                      <a href={c.contactInfo.linkedIn} target="_blank" rel="noopener noreferrer">
-                        LinkedIn
-                      </a>
-                    ) : (
-                      "N/A"
-                    )}
+                  <td style={{ padding: 8 }}>
+                    {c.github ? <a href={c.github} target="_blank" rel="noopener noreferrer">GitHub</a> : "N/A"}
                   </td>
-                  <td>
-                    {c.contactInfo?.github ? (
-                      <a href={c.contactInfo.github} target="_blank" rel="noopener noreferrer">
-                        GitHub
-                      </a>
-                    ) : (
-                      "N/A"
-                    )}
-                  </td>
-                  <td>
-                    <button onClick={() => handleDelete(c.id!)}>🗑️ Delete</button>
+                  <td style={{ padding: 8 }}>
+                    <Link to={`/candidates/${c.id}/edit`} style={{ marginRight: 8 }}>✏️ Edit</Link>
+                    <button onClick={() => handleDelete(c.id!)} disabled={!!deletingIds[c.id!] || loading}>
+                      {deletingIds[c.id!] ? "Deleting…" : "🗑️ Delete"}
+                    </button>
                   </td>
                 </tr>
               ))

@@ -8,11 +8,13 @@ import HomePage from "../pages/HomePage";
 import CompaniesListPage from "../pages/company/CompaniesListPage";
 import CompanyDetailPage from "../pages/company/CompanyDetailPage";
 import CompanyFormPage from "../pages/company/CompanyFormPage";
+import CompanyEditPage from "../pages/company/EditCompanyPage";
 
 // Candidates
 import CandidateListPage from "../pages/candidate/CandidateListPage";
 import CandidateDetailPage from "../pages/candidate/CandidateDetailPage";
 import CandidateFormPage from "../pages/candidate/CandidateFormPage";
+import CandidateEditPage from "../pages/candidate/EditCandidatePage";
 
 //Interviews
 import InterviewListPage from "../pages/interview/InterviewListPage";
@@ -46,11 +48,13 @@ function AppRoutes() {
         <Route path="companies" element={<CompaniesListPage />} />
         <Route path="companies/:id" element={<CompanyDetailPage />} />
         <Route path="companies/new" element={<CompanyFormPage />} />
+        <Route path="companies/:id/edit" element={<CompanyEditPage />} />
 
         {/* Candidates */}
         <Route path="candidates" element={<CandidateListPage />} />
         <Route path="candidates/:id" element={<CandidateDetailPage />} />
         <Route path="candidates/new" element={<CandidateFormPage />} />
+        <Route path="candidates/:id/edit" element={<CandidateEditPage />} /> 
 
         {/* Interviews */}
         <Route path="interviews" element={<InterviewListPage />} />

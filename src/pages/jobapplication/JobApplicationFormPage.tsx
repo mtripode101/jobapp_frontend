@@ -4,7 +4,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { jobApplicationService } from "../../services/jobApplicationService";
 import { getCandidates } from "../../services/candidateService";
 import { getCompanies } from "../../services/companyService";
-import { positionService  } from "../../services/positionService";
+import { positionService } from "../../services/positionService";
 import { JobApplicationDto } from "../../types/jobApplicationDto";
 import { CandidateDto } from "../../types/candidate";
 import { CompanyDto } from "../../types/company";
@@ -13,7 +13,10 @@ import { PositionDto } from "../../types/position";
 const EMPTY_CANDIDATE: CandidateDto = {
   id: 0,
   fullName: "",
-  contactInfo: { email: "", phone: "", linkedIn: "", github: "" },
+  email: "",
+  phone: undefined,
+  linkedIn: undefined,
+  github: undefined,
 };
 
 const EMPTY_COMPANY: CompanyDto = {
@@ -40,7 +43,7 @@ export default function JobApplicationFormPage() {
     company: EMPTY_COMPANY,
     position: EMPTY_POSITION,
     status: "APPLIED",
-  });
+  } as JobApplicationDto);
 
   const [candidates, setCandidates] = useState<CandidateDto[]>([]);
   const [companies, setCompanies] = useState<CompanyDto[]>([]);
@@ -48,9 +51,36 @@ export default function JobApplicationFormPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    getCandidates().then(setCandidates).catch(() => alert("Failed to load candidates"));
-    getCompanies().then(setCompanies).catch(() => alert("Failed to load companies"));
-    positionService.getPositions().then(setPositions).catch(() => alert("Failed to load positions")); // ✅ use method
+    let cancelled = false;
+
+    getCandidates()
+      .then((data) => {
+        if (!cancelled) setCandidates(data);
+      })
+      .catch(() => {
+        if (!cancelled) alert("Failed to load candidates");
+      });
+
+    getCompanies()
+      .then((data) => {
+        if (!cancelled) setCompanies(data);
+      })
+      .catch(() => {
+        if (!cancelled) alert("Failed to load companies");
+      });
+
+    positionService
+      .getPositions()
+      .then((data) => {
+        if (!cancelled) setPositions(data);
+      })
+      .catch(() => {
+        if (!cancelled) alert("Failed to load positions");
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -69,10 +99,16 @@ export default function JobApplicationFormPage() {
       return;
     }
 
-    jobApplicationService.create(formData).then(() => {
-      alert("Application created successfully!");
-      navigate("/applications");
-    });
+    jobApplicationService
+      .create(formData)
+      .then(() => {
+        alert("Application created successfully!");
+        navigate("/applications");
+      })
+      .catch((err: any) => {
+        console.error("Failed to create application:", err);
+        alert(err?.message || "Failed to create application");
+      });
   };
 
   return (
@@ -109,17 +145,18 @@ export default function JobApplicationFormPage() {
         <div>
           <label>Select Candidate:</label>
           <select
-            value={formData.candidate?.id || ""}
+            value={formData.candidate?.id ?? ""}
             onChange={(e) => {
-              const selected = candidates.find((c) => c.id === Number(e.target.value));
-              setFormData({ ...formData, candidate: selected || EMPTY_CANDIDATE });
+              const id = Number(e.target.value);
+              const selected = candidates.find((c) => c.id === id) || EMPTY_CANDIDATE;
+              setFormData({ ...formData, candidate: selected });
             }}
             required
           >
             <option value="">-- Choose a candidate --</option>
             {candidates.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.fullName} ({c.contactInfo?.email})
+                {c.fullName} ({c.email || "N/A"})
               </option>
             ))}
           </select>
@@ -129,17 +166,18 @@ export default function JobApplicationFormPage() {
         <div>
           <label>Select Company:</label>
           <select
-            value={formData.company?.id || ""}
+            value={formData.company?.id ?? ""}
             onChange={(e) => {
-              const selected = companies.find((c) => c.id === Number(e.target.value));
-              setFormData({ ...formData, company: selected || EMPTY_COMPANY });
+              const id = Number(e.target.value);
+              const selected = companies.find((c) => c.id === id) || EMPTY_COMPANY;
+              setFormData({ ...formData, company: selected });
             }}
             required
           >
             <option value="">-- Choose a company --</option>
             {companies.map((c) => (
               <option key={c.id} value={c.id}>
-                {c.name} ({c.website})
+                {c.name} ({c.website || "N/A"})
               </option>
             ))}
           </select>
@@ -149,10 +187,11 @@ export default function JobApplicationFormPage() {
         <div>
           <label>Select Position:</label>
           <select
-            value={formData.position?.id || ""}
+            value={formData.position?.id ?? ""}
             onChange={(e) => {
-              const selected = positions.find((p) => p.id === Number(e.target.value));
-              setFormData({ ...formData, position: selected || EMPTY_POSITION });
+              const id = Number(e.target.value);
+              const selected = positions.find((p) => p.id === id) || EMPTY_POSITION;
+              setFormData({ ...formData, position: selected });
             }}
             required
           >
@@ -170,9 +209,7 @@ export default function JobApplicationFormPage() {
           <label>Status:</label>
           <select
             value={formData.status}
-            onChange={(e) =>
-              setFormData({ ...formData, status: e.target.value as JobApplicationDto["status"] })
-            }
+            onChange={(e) => setFormData({ ...formData, status: e.target.value as JobApplicationDto["status"] })}
           >
             <option value="APPLIED">Applied</option>
             <option value="REJECTED">Rejected</option>

@@ -35,7 +35,7 @@ export default function JobApplicationListPage() {
             <tr key={app.id}>
               <td>{app.id}</td>
               <td>{app.candidate?.fullName}</td>
-              <td>{app.company?.name}</td>
+              <td>{app.position.companyName}</td>
               <td>{app.position?.title}</td>
               <td>{app.status}</td>
               <td>
