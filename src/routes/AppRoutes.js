@@ -8,6 +8,7 @@ import HomePage from "../pages/HomePage";
 import CompaniesListPage from "../pages/company/CompaniesListPage";
 import CompanyDetailPage from "../pages/company/CompanyDetailPage";
 import CompanyFormPage from "../pages/company/CompanyFormPage";
+import CompanyEditPage from "../pages/company/EditCompanyPage";
 
 // Candidates
 import CandidateListPage from "../pages/candidate/CandidateListPage";
@@ -46,6 +47,7 @@ function AppRoutes() {
         <Route path="companies" element={<CompaniesListPage />} />
         <Route path="companies/:id" element={<CompanyDetailPage />} />
         <Route path="companies/new" element={<CompanyFormPage />} />
+        <Route path="companies/:id/edit" element={<CompanyEditPage />} />
 
         {/* Candidates */}
         <Route path="candidates" element={<CandidateListPage />} />
