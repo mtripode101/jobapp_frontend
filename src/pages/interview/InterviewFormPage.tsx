@@ -54,14 +54,14 @@ export default function InterviewFormPage() {
       applicationId: applicationId as number,
     };
 
-    createInterview(newInterview).then(() => navigate("/interview"));
+    createInterview(newInterview).then(() => navigate("/interviews"));
   };
 
   return (
     <div>
       <h2>Add New Interview</h2>
       <Link to="/">🏠 Back to Home</Link> |{" "}
-      <Link to="/interview">📋 Interviews List</Link>
+      <Link to="/interviews">📋 Interviews List</Link>
 
       <form onSubmit={handleSubmit}>
         <div>
