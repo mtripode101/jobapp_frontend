@@ -32,8 +32,8 @@ export const jobOfferService = {
     handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/status/${status}`)),
 
   accept: (id: number): Promise<JobOfferDto> =>
-    handleResponse<JobOfferDto>(axios.put(`${API_URL}/${id}/accept`)),
+    handleResponse<JobOfferDto>(axios.put(`${API_URL}/job-offers/${id}/accept`)),
 
   reject: (id: number): Promise<JobOfferDto> =>
-    handleResponse<JobOfferDto>(axios.put(`${API_URL}/${id}/reject`)),
+    handleResponse<JobOfferDto>(axios.put(`${API_URL}/job-offers/${id}/reject`)),
 };
