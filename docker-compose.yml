@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: jobapp-frontend:local
+    container_name: jobapp-frontend
+    ports:
+      - "3000:80"
+    restart: unless-stopped
+    networks:
+      - jobapp-net
+
+networks:
+  jobapp-net:
+    external: true
