@@ -14,6 +14,11 @@ export const jobApplicationService = {
   getAll: (): Promise<JobApplicationDto[]> =>
     handleResponse<JobApplicationDto[]>(axios.get(`${API_URL}/applications`)),
 
+  getPaged: (page: number, size: number): Promise<any> =>
+    handleResponse<any>(
+      axios.get(`${API_URL}/applications/paged?page=${page}&size=${size}`)
+    ),
+
   getById: (id: number): Promise<JobApplicationDto> =>
     handleResponse<JobApplicationDto>(axios.get(`${API_URL}/applications/${id}`)),
 
