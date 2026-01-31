@@ -18,7 +18,7 @@ export const jobApplicationService = {
     handleResponse<JobApplicationDto>(axios.get(`${API_URL}/applications/${id}`)),
 
   create: (dto: JobApplicationDto): Promise<JobApplicationDto> =>
-    handleResponse<JobApplicationDto>(axios.post(API_URL, dto)),
+    handleResponse<JobApplicationDto>(axios.post(`${API_URL}/applications`, dto)),
 
   createRejected: (dto: JobApplicationDto): Promise<JobApplicationDto> =>
     handleResponse<JobApplicationDto>(axios.post(`${API_URL}/applications/rejected`, dto)),
@@ -27,7 +27,7 @@ export const jobApplicationService = {
     handleResponse<JobApplicationDto>(axios.put(`${API_URL}/${id}/applications/status?newStatus=${newStatus}`)),
 
   delete: (id: number): Promise<void> =>
-    handleResponse<void>(axios.delete(`${API_URL}/${id}`)),
+    handleResponse<void>(axios.delete(`${API_URL}/applications/${id}`)),
 
   findByStatus: (status: string): Promise<JobApplicationDto[]> =>
     handleResponse<JobApplicationDto[]>(axios.get(`${API_URL}/applications/status/${status}`)),

@@ -36,6 +36,7 @@ const EMPTY_POSITION: PositionDto = {
 
 export default function JobApplicationFormPage() {
   const [formData, setFormData] = useState<JobApplicationDto>({
+    jobId: "",
     sourceLink: "",
     websiteSource: "",
     description: "",
@@ -107,7 +108,16 @@ export default function JobApplicationFormPage() {
       })
       .catch((err: any) => {
         console.error("Failed to create application:", err);
-        alert(err?.message || "Failed to create application");
+
+        if (err.response?.status === 409) {
+          // El backend devuelve 409 Conflict si el JobId ya existe
+          alert(`This Job ID (${formData.jobId}) already exists. Please use another.`);
+        } else if (err.response?.status === 400) {
+          // Si decides devolver 400 Bad Request en el backend
+          alert(err.response?.data?.message || "Invalid request data");
+        } else {
+          alert(err?.message || "Failed to create application");
+        }
       });
   };
 
@@ -117,6 +127,17 @@ export default function JobApplicationFormPage() {
       <form onSubmit={handleSubmit}>
         {/* Source info */}
         <div>
+
+          <div>
+            <label>Job Id:</label>
+            <input
+              type="text"
+              value={formData.jobId}
+              onChange={(e) => setFormData({ ...formData, jobId: e.target.value })}
+              required
+            />
+          </div>
+
           <label>Source Link:</label>
           <input
             type="text"
