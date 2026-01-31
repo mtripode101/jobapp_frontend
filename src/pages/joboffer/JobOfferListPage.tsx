@@ -263,11 +263,6 @@ export default function JobOfferListPage() {
         </button>
       </div>
 
-      {!loading && (
-        <pre style={{ background: "#f6f6f6", padding: 8, marginTop: 12 }}>
-          {JSON.stringify({ offers, applicationsMapKeys: Object.keys(applicationsMap), error }, null, 2)}
-        </pre>
-      )}
     </div>
   );
 }

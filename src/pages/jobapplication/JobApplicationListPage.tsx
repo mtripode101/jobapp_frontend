@@ -71,6 +71,7 @@ export default function JobApplicationListPage() {
                 <th>Company</th>
                 <th>Position</th>
                 <th>Status</th>
+                <th>Date Applied</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -82,6 +83,7 @@ export default function JobApplicationListPage() {
                   <td>{app.company?.name || app.position?.companyName}</td>
                   <td>{app.position?.title}</td>
                   <td>{app.status}</td>
+                  <td>{new Date(app.dateApplied).toLocaleDateString()}</td>
                   <td>
                     <Link to={`/applications/${app.id}`}>🔍 Detail</Link>{" "}
                     <button
