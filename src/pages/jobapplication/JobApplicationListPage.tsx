@@ -1,4 +1,3 @@
-// src/pages/JobApplicationListPage.tsx
 import React, { useEffect, useState } from "react";
 import { jobApplicationService } from "../../services/jobApplicationService";
 import { JobApplicationDto } from "../../types/jobApplicationDto";
@@ -11,6 +10,22 @@ export default function JobApplicationListPage() {
     jobApplicationService.getAll().then(setApplications);
   }, []);
 
+  const handleDelete = (id: number) => {
+    if (window.confirm("Are you sure you want to delete this application?")) {
+      jobApplicationService
+        .delete(id)
+        .then(() => {
+          // Filtrar la lista local para quitar el eliminado
+          setApplications((prev) => prev.filter((app) => app.id !== id));
+          alert("Application deleted successfully!");
+        })
+        .catch((err) => {
+          console.error("Failed to delete application:", err);
+          alert(err?.message || "Failed to delete application");
+        });
+    }
+  };
+
   return (
     <div>
       <h2>Job Applications</h2>
@@ -22,7 +37,7 @@ export default function JobApplicationListPage() {
       <table border={1} style={{ width: "100%", marginTop: "20px" }}>
         <thead>
           <tr>
-            <th>ID</th>
+            <th>JobID</th>
             <th>Candidate</th>
             <th>Company</th>
             <th>Position</th>
@@ -33,13 +48,19 @@ export default function JobApplicationListPage() {
         <tbody>
           {applications.map((app) => (
             <tr key={app.id}>
-              <td>{app.id}</td>
+              <td>{app.jobId}</td>
               <td>{app.candidate?.fullName}</td>
               <td>{app.position.companyName}</td>
               <td>{app.position?.title}</td>
               <td>{app.status}</td>
               <td>
-                <Link to={`/applications/${app.id}`}>🔍 Detail</Link>
+                <Link to={`/applications/${app.id}`}>🔍 Detail</Link>{" "}
+                <button
+                  style={{ marginLeft: "10px", color: "red" }}
+                  onClick={() => handleDelete(app.id!)}
+                >
+                  🗑️ Delete
+                </button>
               </td>
             </tr>
           ))}
