@@ -31,6 +31,14 @@ export const jobApplicationService = {
   updateStatus: (id: number, newStatus: string): Promise<JobApplicationDto> =>
     handleResponse<JobApplicationDto>(axios.put(`${API_URL}/${id}/applications/status?newStatus=${newStatus}`)),
 
+  update: (id: number, dto: JobApplicationDto): Promise<JobApplicationDto> =>
+    handleResponse<JobApplicationDto>(
+      axios.put(`${API_URL}/applications/${id}`, dto, {
+        headers: { "Content-Type": "application/json" },
+      })
+    ),
+
+
   delete: (id: number): Promise<void> =>
     handleResponse<void>(axios.delete(`${API_URL}/applications/${id}`)),
 

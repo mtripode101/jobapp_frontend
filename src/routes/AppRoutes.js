@@ -31,6 +31,7 @@ import PositionEditPage from "../pages/position/PositionEditPage";
 import JobApplicationListPage from "../pages/jobapplication/JobApplicationListPage";
 import JobApplicationDetailPage from "../pages/jobapplication/JobApplicationDetailPage";
 import JobApplicationFormPage from "../pages/jobapplication/JobApplicationFormPage";  
+import JobApplicationEditPage from "../pages/jobapplication/jobApplicationEditPage";
 
 //Job Offers
 import JobOfferListPage from "../pages/joboffer/JobOfferListPage";
@@ -73,6 +74,7 @@ function AppRoutes() {
         <Route path="applications" element={<JobApplicationListPage />} />
         <Route path="applications/new" element={<JobApplicationFormPage />} />
         <Route path="applications/:id" element={<JobApplicationDetailPage />} />  
+        <Route path="applications/:id/edit" element={<JobApplicationEditPage />} />
 
         {/* Job Offers */}
         <Route path="job-offers" element={<JobOfferListPage />} />
