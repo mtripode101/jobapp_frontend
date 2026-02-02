@@ -43,7 +43,7 @@ export default function JobApplicationFormPage() {
     candidate: EMPTY_CANDIDATE,
     company: EMPTY_COMPANY,
     position: EMPTY_POSITION,
-    status: "APPLIED",
+    status: "Applied",
   } as JobApplicationDto);
 
   const [candidates, setCandidates] = useState<CandidateDto[]>([]);
@@ -232,10 +232,12 @@ export default function JobApplicationFormPage() {
             value={formData.status}
             onChange={(e) => setFormData({ ...formData, status: e.target.value as JobApplicationDto["status"] })}
           >
-            <option value="APPLIED">Applied</option>
-            <option value="REJECTED">Rejected</option>
-            <option value="INTERVIEW">Interview</option>
-            <option value="OFFERED">Offered</option>
+            <option value="Applied">Applied</option>
+            <option value="Rejected">Rejected</option>
+            <option value="Interviewed">Interview</option>
+            <option value="Offered">Offered</option>
+            <option value="Interview Scheduled">Interview Scheduled</option>
+            <option value="Hired">Hired</option>
           </select>
         </div>
 

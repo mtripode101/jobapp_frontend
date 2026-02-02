@@ -86,6 +86,9 @@ export default function JobApplicationListPage() {
                   <td>{new Date(app.dateApplied).toLocaleDateString()}</td>
                   <td>
                     <Link to={`/applications/${app.id}`}>🔍 Detail</Link>{" "}
+                    <Link to={`/applications/${app.id}/edit`} style={{ marginLeft: "10px", color: "blue" }}>
+                      ✏️ Edit
+                    </Link>
                     <button
                       style={{ marginLeft: "10px", color: "red" }}
                       onClick={() => handleDelete(app.id!)}

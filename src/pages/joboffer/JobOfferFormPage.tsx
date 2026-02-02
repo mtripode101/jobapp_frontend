@@ -45,6 +45,7 @@ export default function JobOfferFormPage() {
             <option value="PENDING">Pending</option>
             <option value="ACCEPTED">Accepted</option>
             <option value="REJECTED">Rejected</option>
+            
           </select>
         </div>
         <button type="submit">Save Offer</button>

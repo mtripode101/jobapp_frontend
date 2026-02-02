@@ -23,6 +23,8 @@ export default function JobOfferDetailPage() {
       <p><strong>Application ID:</strong> {offer.applicationId}</p>
       <p><strong>Offered At:</strong> {offer.offeredAt}</p>
       <p><strong>Status:</strong> {offer.status}</p>
+      <p><strong>Expected Salary:</strong> {offer.expectedSalary != null ? `$${offer.expectedSalary}` : "—"}</p>
+      <p><strong>Offered Salary:</strong> {offer.offeredSalary != null ? `$${offer.offeredSalary}` : "—"}</p>
 
       <Link to="/job-offers">⬅ Back to List</Link>
     </div>
