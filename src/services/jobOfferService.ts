@@ -19,7 +19,7 @@ export const jobOfferService = {
 
   create: (applicationId: number, offeredAt: string, status: string): Promise<JobOfferDto> =>
     handleResponse<JobOfferDto>(
-      axios.post(API_URL, null, { params: { applicationId, offeredAt, status } })
+      axios.post(`${API_URL}/job-offers`, null, { params: { applicationId, offeredAt, status } })
     ),
 
   update: (id: number, dto: JobOfferDto): Promise<JobOfferDto> =>
@@ -36,4 +36,40 @@ export const jobOfferService = {
 
   reject: (id: number): Promise<JobOfferDto> =>
     handleResponse<JobOfferDto>(axios.put(`${API_URL}/job-offers/${id}/reject`)),
+
+  // --- Nuevas llamadas por salario ---
+  findByExpectedSalaryGreaterThan: (salary: number): Promise<JobOfferDto[]> =>
+    handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/expected-salary/greater-than`, { params: { salary } })),
+
+  findByOfferedSalaryLessThan: (salary: number): Promise<JobOfferDto[]> =>
+    handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/offered-salary/less-than`, { params: { salary } })),
+
+  findByExpectedSalaryBetween: (minSalary: number, maxSalary: number): Promise<JobOfferDto[]> =>
+    handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/expected-salary/between`, { params: { minSalary, maxSalary } })),
+
+  findByOfferedSalaryBetween: (minSalary: number, maxSalary: number): Promise<JobOfferDto[]> =>
+    handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/offered-salary/between`, { params: { minSalary, maxSalary } })),
+
+  // --- Null / Not Null ---
+  findByExpectedSalaryIsNull: (): Promise<JobOfferDto[]> =>
+    handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/expected-salary/null`)),
+
+  findByOfferedSalaryIsNull: (): Promise<JobOfferDto[]> =>
+    handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/offered-salary/null`)),
+
+  findByExpectedSalaryIsNotNull: (): Promise<JobOfferDto[]> =>
+    handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/expected-salary/not-null`)),
+
+  findByOfferedSalaryIsNotNull: (): Promise<JobOfferDto[]> =>
+    handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/offered-salary/not-null`)),
+
+  // --- Combinadas ---
+  findByExpectedSalaryGreaterThanAndOfferedSalaryLessThan: (expectedMin: number, offeredMax: number): Promise<JobOfferDto[]> =>
+    handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/expected-greater-and-offered-less`, { params: { expectedMin, offeredMax } })),
+
+  findByExpectedSalaryLessThanAndOfferedSalaryGreaterThan: (expectedMax: number, offeredMin: number): Promise<JobOfferDto[]> =>
+    handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/expected-less-and-offered-greater`, { params: { expectedMax, offeredMin } })),
+
+  findByExpectedSalaryEqualsOfferedSalary: (): Promise<JobOfferDto[]> =>
+    handleResponse<JobOfferDto[]>(axios.get(`${API_URL}/job-offers/salary/equals`)),
 };

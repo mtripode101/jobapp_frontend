@@ -36,6 +36,7 @@ import JobApplicationFormPage from "../pages/jobapplication/JobApplicationFormPa
 import JobOfferListPage from "../pages/joboffer/JobOfferListPage";
 import JobOfferDetailPage from "../pages/joboffer/JobOfferDetailPage";
 import JobOfferFormPage from "../pages/joboffer/JobOfferFormPage";
+import JobOfferEditPage from "../pages/joboffer/JobOfferEditPage";
 
 
 function AppRoutes() {
@@ -77,6 +78,7 @@ function AppRoutes() {
         <Route path="job-offers" element={<JobOfferListPage />} />
         <Route path="job-offers/:id" element={<JobOfferDetailPage />} />
         <Route path="job-offers/new" element={<JobOfferFormPage />} />
+        <Route path="job-offers/:id/edit" element={<JobOfferEditPage />} />
 
         {/* 404 */}
         <Route path="*" element={<p>404 - Page Not Found</p>} />

@@ -14,7 +14,6 @@ export default function JobOfferListPage() {
   const [processingId, setProcessingId] = useState<number | null>(null);
 
   const normalizeOffersAndApps = (rawOffers: any, rawApps: any) => {
-    // Normalize offers array from various possible shapes
     const offersArray: any[] = Array.isArray(rawOffers)
       ? rawOffers
       : Array.isArray(rawOffers?.data)
@@ -25,27 +24,23 @@ export default function JobOfferListPage() {
       ? rawOffers.items
       : [];
 
-    // Normalize apps array
     const appsArray: any[] = Array.isArray(rawApps)
       ? rawApps
       : Array.isArray(rawApps?.data)
       ? rawApps.data
       : [];
 
-    // Build initial map from appsArray
     const map: Record<number, JobApplicationDto> = {};
     appsArray.forEach((a: any) => {
       if (a?.id != null) map[a.id] = a;
     });
 
-    // If no offers returned directly, try to extract offers embedded in applications
     let offersFromApps: any[] = [];
     if (offersArray.length === 0 && appsArray.length > 0) {
       appsArray.forEach((a: any) => {
         if (Array.isArray(a.offers) && a.offers.length > 0) {
           a.offers.forEach((of: any) => {
             if (!of.applicationId && a.id) of.applicationId = a.id;
-            // ensure the offer has a reference to its application
             of.application = of.application ?? a;
             offersFromApps.push(of);
           });
@@ -55,7 +50,6 @@ export default function JobOfferListPage() {
 
     const finalOffersArray = offersArray.length ? offersArray : offersFromApps;
 
-    // Transform offers into the DTO shape expected by the UI and merge embedded applications into the map
     const normalizedOffers: JobOfferDto[] = finalOffersArray.map((o: any) => {
       const applicationObj = o?.application ?? null;
       const applicationId = applicationObj?.id ?? o?.applicationId ?? null;
@@ -72,6 +66,8 @@ export default function JobOfferListPage() {
         status: o.status,
         applicationId: applicationId,
         application: applicationObj ?? undefined,
+        expectedSalary: o.expectedSalary ?? null,
+        offeredSalary: o.offeredSalary ?? null,
       } as JobOfferDto;
     });
 
@@ -86,9 +82,6 @@ export default function JobOfferListPage() {
     Promise.all([jobOfferService.getAll(), jobApplicationService.getAll()])
       .then(([offersData, appsData]) => {
         if (!mounted) return;
-        console.log("offersData raw ->", offersData);
-        console.log("apps raw ->", appsData);
-
         const { normalizedOffers, applicationsMap: mergedMap } = normalizeOffersAndApps(offersData, appsData);
         setOffers(normalizedOffers);
         setApplicationsMap(mergedMap);
@@ -193,6 +186,8 @@ export default function JobOfferListPage() {
               <th>Company</th>
               <th>Position</th>
               <th>Offered At</th>
+              <th>Expected Salary</th>
+              <th>Offered Salary</th>
               <th>Offer Status</th>
               <th style={{ minWidth: 220 }}>Actions</th>
             </tr>
@@ -203,7 +198,6 @@ export default function JobOfferListPage() {
               return (
                 <tr key={offer.id}>
                   <td>{offer.id}</td>
-
                   <td>
                     {app?.candidate?.fullName ? (
                       <Link to={`/applications/${app.id}`}>{app.candidate.fullName}</Link>
@@ -211,13 +205,12 @@ export default function JobOfferListPage() {
                       app ? "—" : <span>Application #{offer.applicationId}</span>
                     )}
                   </td>
-
                   <td>{app?.company?.name ?? "—"}</td>
                   <td>{app?.position?.title ?? "—"}</td>
-
                   <td>{formatDate(offer.offeredAt)}</td>
+                  <td>{offer.expectedSalary != null ? `$${offer.expectedSalary}` : "—"}</td>
+                  <td>{offer.offeredSalary != null ? `$${offer.offeredSalary}` : "—"}</td>
                   <td>{offer.status ?? "—"}</td>
-
                   <td>
                     <Link to={`/job-offers/${offer.id}`} style={{ marginRight: 8 }}>
                       🔍 Detail
@@ -225,7 +218,6 @@ export default function JobOfferListPage() {
                     <Link to={`/job-offers/${offer.id}/edit`} style={{ marginRight: 8 }}>
                       ✏️ Edit
                     </Link>
-
                     {offer.status !== "ACCEPTED" && (
                       <button
                         onClick={() => offer.id && handleAccept(offer.id)}
@@ -235,7 +227,6 @@ export default function JobOfferListPage() {
                         {processingId === offer.id ? "Processing..." : "Accept"}
                       </button>
                     )}
-
                     {offer.status !== "REJECTED" && (
                       <button
                         onClick={() => offer.id && handleReject(offer.id)}
@@ -245,8 +236,10 @@ export default function JobOfferListPage() {
                         {processingId === offer.id ? "Processing..." : "Reject"}
                       </button>
                     )}
-
-                    <button onClick={() => offer.id && handleDelete(offer.id)} disabled={processingId === offer.id}>
+                    <button
+                      onClick={() => offer.id && handleDelete(offer.id)}
+                      disabled={processingId === offer.id}
+                    >
                       {processingId === offer.id ? "Processing..." : "Delete"}
                     </button>
                   </td>
@@ -262,7 +255,6 @@ export default function JobOfferListPage() {
           Refresh
         </button>
       </div>
-
     </div>
   );
 }

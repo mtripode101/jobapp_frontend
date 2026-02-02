@@ -13,5 +13,5 @@ export interface JobApplicationDto extends BaseDto {
   candidate: CandidateDto;
   company: CompanyDto;
   position: PositionDto;
-  status: "APPLIED" | "REJECTED" | "INTERVIEW" | "OFFERED";
+  status: "Applied" | "Rejected" | "Interviewed" | "Offered" | "Interview Scheduled" | "Hired";
 }
