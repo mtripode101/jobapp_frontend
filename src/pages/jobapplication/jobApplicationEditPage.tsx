@@ -102,12 +102,13 @@ export default function JobApplicationEditPage() {
             value={formData.status}
             onChange={(e) => setFormData({ ...formData, status: e.target.value as JobApplicationDto["status"] })}
           >
-            <option value="Applied">Applied</option>
-            <option value="Rejected">Rejected</option>
-            <option value="Interviewed">Interviewed</option>
-            <option value="Offered">Offered</option>
-            <option value="Interview Scheduled">Interview Scheduled</option>
-            <option value="Hired">Hired</option>
+            <option value="APPLIED">Applied</option>
+            <option value="REJECTED">Rejected</option>
+            <option value="INTERVIEWED">Interviewed</option>
+            <option value="OFFERED">Offered</option>
+            <option value="INTERVIEW_SCHEDULED">Interview Scheduled</option>
+            <option value="HIRED">Hired</option>
+
           </select>
         </div>
 

@@ -43,7 +43,7 @@ export default function JobApplicationFormPage() {
     candidate: EMPTY_CANDIDATE,
     company: EMPTY_COMPANY,
     position: EMPTY_POSITION,
-    status: "Applied",
+    status: "APPLIED",
   } as JobApplicationDto);
 
   const [candidates, setCandidates] = useState<CandidateDto[]>([]);

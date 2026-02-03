@@ -24,7 +24,7 @@ export default function JobApplicationDetailPage() {
       <p><strong>JobID:</strong> {application.jobId}</p>
       <p><strong>Candidate:</strong> {application.candidate?.fullName}</p>
       <p><strong>Company:</strong> {application.company?.name}</p>
-      <p><strong>Position:</strong> {application.position?.title}</p>
+      <p><strong>Position:</strong> {application.position?.title} - {application.position.location}</p>
       <p><strong>Status:</strong> {application.status}</p>
       <p><strong>Description:</strong> {application.description}</p>
       <p><strong>Source Link:</strong> {application.sourceLink}</p>
