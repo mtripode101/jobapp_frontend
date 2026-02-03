@@ -3,6 +3,8 @@ import { BaseDto } from "./baseDto";
 import { CandidateDto } from "./candidate";
 import { CompanyDto } from "./company";
 import { PositionDto } from "./position";
+import { InterviewDto } from "./interviewDto"; 
+import { JobOfferDto } from "./jobOfferDto";
 
 export interface JobApplicationDto extends BaseDto {
   jobId: string;
@@ -13,5 +15,7 @@ export interface JobApplicationDto extends BaseDto {
   candidate: CandidateDto;
   company: CompanyDto;
   position: PositionDto;
-  status: "Applied" | "Rejected" | "Interviewed" | "Offered" | "Interview Scheduled" | "Hired";
+  status: "APPLIED" | "REJECTED" | "INTERVIEWED" | "OFFERED" | "INTERVIEW_SCHEDULED" | "HIRED";
+  interviews?: InterviewDto[];
+  offers?: JobOfferDto[];
 }

@@ -160,7 +160,7 @@ export default function EditInterviewPage() {
             <option value="">-- Select Application --</option>
             {applications.map((app) => (
               <option key={app.id} value={app.id}>
-                {app.id} - {app.candidate?.fullName ?? "Candidate"} @ {app.company?.name ?? "Company"} - {app.position?.title ?? ""}
+                {app.jobId} - {app.candidate?.fullName ?? "Candidate"} @ {app.company?.name ?? "Company"} - {app.position?.title ?? ""}
               </option>
             ))}
           </select>
