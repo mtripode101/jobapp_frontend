@@ -1,3 +1,4 @@
+// src/pages/JobApplicationEditPage.tsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { jobApplicationService } from "../../services/jobApplicationService";
@@ -8,6 +9,8 @@ import { PositionDto } from "../../types/position";
 import { getCandidates } from "../../services/candidateService";
 import { getCompanies } from "../../services/companyService";
 import { positionService } from "../../services/positionService";
+import { InterviewDto } from "../../types/interviewDto";
+import { JobOfferDto } from "../../types/jobOfferDto"; // 👈 nuevo import
 
 export default function JobApplicationEditPage() {
   const { id } = useParams<{ id: string }>();
@@ -55,6 +58,7 @@ export default function JobApplicationEditPage() {
     <div>
       <h2>Edit Job Application</h2>
       <form onSubmit={handleSubmit}>
+        {/* campos de edición */}
         <div>
           <label>Job Id:</label>
           <input
@@ -109,6 +113,41 @@ export default function JobApplicationEditPage() {
 
         <button type="submit">Update Application</button>
       </form>
+
+      {/* 🔹 Interviews linked to this application */}
+      <div style={{ marginTop: "20px" }}>
+        <h3>Interviews</h3>
+        {formData.interviews && formData.interviews.length > 0 ? (
+          <ul>
+            {formData.interviews.map((iv: InterviewDto) => (
+              <li key={iv.id}>
+                {new Date(iv.scheduledAt).toLocaleString()} — {iv.type}
+                {iv.feedback && <span> | Feedback: {iv.feedback}</span>}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No interviews linked to this application</p>
+        )}
+      </div>
+
+      {/* 🔹 Offers linked to this application */}
+      <div style={{ marginTop: "20px" }}>
+        <h3>Job Offers</h3>
+        {formData.offers && formData.offers.length > 0 ? (
+          <ul>
+            {formData.offers.map((offer: JobOfferDto) => (
+              <li key={offer.id}>
+                Offered At: {new Date(offer.offeredAt).toLocaleDateString()} — Status: {offer.status}
+                {offer.expectedSalary !== null && <span> | Expected: {offer.expectedSalary}</span>}
+                {offer.offeredSalary !== null && <span> | Offered: {offer.offeredSalary}</span>}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No offers linked to this application</p>
+        )}
+      </div>
 
       <div style={{ marginTop: "10px" }}>
         <Link to="/applications">⬅️ Back to Applications List</Link>

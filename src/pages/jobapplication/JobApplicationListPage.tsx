@@ -8,19 +8,26 @@ export default function JobApplicationListPage() {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [inputPage, setInputPage] = useState("1"); // control del input manual
+  const [inputPage, setInputPage] = useState("1");
+
+  // 🔹 Filters
+  const [candidateFilter, setCandidateFilter] = useState("");
+  const [companyFilter, setCompanyFilter] = useState("");
+  const [statusFilter, setStatusFilter] = useState("");
 
   useEffect(() => {
     setLoading(true);
-    jobApplicationService.getPaged(page, 5).then((data) => {
-      setApplications(data.content);
-      setTotalPages(data.totalPages);
-      setLoading(false);
-      setInputPage((page + 1).toString()); // sincroniza input con la página actual
-    }).catch((err) => {
-      console.error("Failed to fetch applications:", err);
-      setLoading(false);
-    });
+    jobApplicationService.getPaged(page, 15) // 👈 ahora 15 por página
+      .then((data) => {
+        setApplications(data.content);
+        setTotalPages(data.totalPages);
+        setLoading(false);
+        setInputPage((page + 1).toString());
+      })
+      .catch((err) => {
+        console.error("Failed to fetch applications:", err);
+        setLoading(false);
+      });
   }, [page]);
 
   const handleDelete = (id: number) => {
@@ -45,19 +52,55 @@ export default function JobApplicationListPage() {
   const goToPage = () => {
     const num = parseInt(inputPage, 10);
     if (!isNaN(num) && num >= 1 && num <= totalPages) {
-      setPage(num - 1); // ajusta porque el backend usa base 0
+      setPage(num - 1);
     } else {
       alert(`Please enter a valid page number between 1 and ${totalPages}`);
     }
   };
 
+  // 🔹 Apply filters
+  const filteredApplications = applications.filter((app) => {
+    const candidateName = app.candidate?.fullName?.toLowerCase() || "";
+    const companyName = (app.company?.name || app.position?.companyName || "").toLowerCase();
+    const status = app.status?.toLowerCase() || "";
+
+    return (
+      candidateName.includes(candidateFilter.toLowerCase()) &&
+      companyName.includes(companyFilter.toLowerCase()) &&
+      status.includes(statusFilter.toLowerCase())
+    );
+  });
+
   return (
     <div>
       <h2>Job Applications</h2>
 
-      {/* 🔗 Navigation */}
       <Link to="/">🏠 Back to Home</Link> |{" "}
       <Link to="/applications/new">➕ Create Application</Link>
+
+      {/* 🔹 Filter controls */}
+      <div style={{ margin: "12px 0" }}>
+        <input
+          type="text"
+          placeholder="Filter by candidate"
+          value={candidateFilter}
+          onChange={(e) => setCandidateFilter(e.target.value)}
+          style={{ marginRight: 8 }}
+        />
+        <input
+          type="text"
+          placeholder="Filter by company"
+          value={companyFilter}
+          onChange={(e) => setCompanyFilter(e.target.value)}
+          style={{ marginRight: 8 }}
+        />
+        <input
+          type="text"
+          placeholder="Filter by status"
+          value={statusFilter}
+          onChange={(e) => setStatusFilter(e.target.value)}
+        />
+      </div>
 
       {loading ? (
         <p>Loading applications...</p>
@@ -76,7 +119,7 @@ export default function JobApplicationListPage() {
               </tr>
             </thead>
             <tbody>
-              {applications.map((app) => (
+              {filteredApplications.map((app) => (
                 <tr key={app.id}>
                   <td>{app.jobId}</td>
                   <td>{app.candidate?.fullName}</td>
@@ -116,7 +159,6 @@ export default function JobApplicationListPage() {
               Next ➡️
             </button>
 
-            {/* 🔹 Input manual de página */}
             <div style={{ marginTop: "10px" }}>
               <input
                 type="number"

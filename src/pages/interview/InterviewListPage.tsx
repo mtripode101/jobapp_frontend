@@ -121,13 +121,7 @@ export default function InterviewListPage() {
                 const app = it.applicationId ? applicationsMap[it.applicationId] : undefined;
                 return (
                   <tr key={it.id}>
-                    <td>
-                      {it.id ? (
-                        <Link to={`/interviews/${it.id}`}>{formatDate(it.scheduledAt)}</Link>
-                      ) : (
-                        formatDate(it.scheduledAt)
-                      )}
-                    </td>
+                    <td>{formatDate(it.scheduledAt)}</td>
                     <td>{it.type}</td>
                     <td>{app?.candidate?.fullName ?? "—"}</td>
                     <td>{app?.company?.name ?? "—"}</td>
