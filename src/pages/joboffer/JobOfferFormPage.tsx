@@ -1,13 +1,26 @@
-// src/pages/JobOfferFormPage.tsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { jobOfferService } from "../../services/jobOfferService";
+import { jobApplicationService } from "../../services/jobApplicationService";
+import { JobApplicationDto } from "../../types/jobApplicationDto";
 
 export default function JobOfferFormPage() {
   const [applicationId, setApplicationId] = useState<number>(0);
   const [offeredAt, setOfferedAt] = useState<string>("");
   const [status, setStatus] = useState<string>("PENDING");
+  const [applications, setApplications] = useState<JobApplicationDto[]>([]);
+  const [loadingApps, setLoadingApps] = useState<boolean>(true);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    jobApplicationService.getAll()
+      .then((data) => setApplications(data))
+      .catch((err) => {
+        console.error("Error loading applications", err);
+        alert("Failed to load applications");
+      })
+      .finally(() => setLoadingApps(false));
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,13 +35,23 @@ export default function JobOfferFormPage() {
       <h2>Create Job Offer</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Application ID:</label>
-          <input
-            type="number"
-            value={applicationId}
-            onChange={(e) => setApplicationId(Number(e.target.value))}
-            required
-          />
+          <label>Application:</label>
+          {loadingApps ? (
+            <p>Loading applications...</p>
+          ) : (
+            <select
+              value={applicationId}
+              onChange={(e) => setApplicationId(Number(e.target.value))}
+              required
+            >
+              <option value="">-- Select Application --</option>
+              {applications.map((app) => (
+                <option key={app.id} value={app.id}>
+                  {app.id} - {app.candidate.fullName} ({app.jobId})
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <div>
           <label>Offered At:</label>
@@ -45,13 +68,11 @@ export default function JobOfferFormPage() {
             <option value="PENDING">Pending</option>
             <option value="ACCEPTED">Accepted</option>
             <option value="REJECTED">Rejected</option>
-            
           </select>
         </div>
         <button type="submit">Save Offer</button>
       </form>
 
-      {/* 🔙 Back to previous page */}
       <div style={{ marginTop: "10px" }}>
         <button onClick={() => navigate(-1)}>⬅️ Back to Previous Page</button>
       </div>
