@@ -2,16 +2,21 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { jobOfferService } from "../../services/jobOfferService";
+import { jobApplicationService } from "../../services/jobApplicationService";
 import { JobOfferDto } from "../../types/jobOfferDto";
+import { JobApplicationDto } from "../../types/jobApplicationDto";
 
 export default function JobOfferEditPage() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
   const [offer, setOffer] = useState<JobOfferDto | null>(null);
+  const [applications, setApplications] = useState<JobApplicationDto[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
+  const [loadingApps, setLoadingApps] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
+  // Cargar la oferta
   useEffect(() => {
     if (id) {
       setLoading(true);
@@ -28,6 +33,18 @@ export default function JobOfferEditPage() {
         });
     }
   }, [id]);
+
+  // Cargar aplicaciones disponibles
+  useEffect(() => {
+    jobApplicationService
+      .getAll()
+      .then((data) => setApplications(data))
+      .catch((err) => {
+        console.error("Error loading applications", err);
+        alert("Failed to load applications");
+      })
+      .finally(() => setLoadingApps(false));
+  }, []);
 
   const handleChange = (field: keyof JobOfferDto, value: any) => {
     if (!offer) return;
@@ -59,13 +76,23 @@ export default function JobOfferEditPage() {
       <h2>Edit Job Offer #{offer.id}</h2>
       <form onSubmit={handleSubmit}>
         <div>
-          <label>Application ID:</label>
-          <input
-            type="number"
-            value={offer.applicationId ?? ""}
-            onChange={(e) => handleChange("applicationId", Number(e.target.value))}
-            required
-          />
+          <label>Application:</label>
+          {loadingApps ? (
+            <p>Loading applications...</p>
+          ) : (
+            <select
+              value={offer.applicationId ?? ""}
+              onChange={(e) => handleChange("applicationId", Number(e.target.value))}
+              required
+            >
+              <option value="">-- Select Application --</option>
+              {applications.map((app) => (
+                <option key={app.id} value={app.id}>
+                  {app.id} - {app.candidate.fullName} ({app.jobId})
+                </option>
+              ))}
+            </select>
+          )}
         </div>
         <div>
           <label>Offered At:</label>
