@@ -24,3 +24,6 @@ export const updateCompany = (id: number, companyDto: CompanyDto): Promise<Compa
 
 export const deleteCompany = (id: number): Promise<void> =>
   handleResponse<void>(axios.delete(`${API_URL}/companies/${id}`));
+
+export const getCompanyByName = (name: string): Promise<CompanyDto> =>
+  handleResponse<CompanyDto>(axios.get(`${API_URL}/companies/${name}/search`));

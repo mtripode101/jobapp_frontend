@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { getCompanies, deleteCompany } from "../../services/companyService";
+import { getCompanies, deleteCompany, getCompanyByName } from "../../services/companyService";
 import { CompanyDto } from "../../types/company";
 
 export default function CompaniesListPage() {
@@ -10,6 +10,7 @@ export default function CompaniesListPage() {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [deletingIds, setDeletingIds] = useState<Record<number, boolean>>({});
   const [filter, setFilter] = useState<string>("");
+  const [remoteCompany, setRemoteCompany] = useState<CompanyDto | null>(null);
 
   const loadCompanies = useCallback(() => {
     setLoading(true);
@@ -59,10 +60,23 @@ export default function CompaniesListPage() {
     }
   };
 
-  // Filtrar compañías por nombre
+  // Filtrar compañías por nombre (local)
   const filteredCompanies = companies.filter((c) =>
     c.name.toLowerCase().includes(filter.toLowerCase())
   );
+
+  // Buscar compañía en servidor (remoto)
+  const handleSearchRemote = async () => {
+    if (!filter.trim()) return;
+    try {
+      const company = await getCompanyByName(filter);
+      setRemoteCompany(company);
+      setError(null);
+    } catch (err: any) {
+      setRemoteCompany(null);
+      setError(err?.message || "Company not found");
+    }
+  };
 
   return (
     <div>
@@ -87,11 +101,33 @@ export default function CompaniesListPage() {
             width: "250px",
           }}
         />
+        <button
+          onClick={handleSearchRemote}
+          style={{
+            marginLeft: "8px",
+            padding: "6px 12px",
+            borderRadius: "4px",
+            border: "1px solid #ccc",
+            cursor: "pointer",
+          }}
+        >
+          🔍 Search in server
+        </button>
       </div>
 
       {loading && <p>Loading companies...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
       {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}
+
+      {/* Resultado remoto */}
+      {remoteCompany && (
+        <div style={{ marginTop: 12, padding: "8px", border: "1px solid #ccc" }}>
+          <strong>Found in server:</strong> {remoteCompany.name}
+          <Link to={`/companies/${remoteCompany.id}`} style={{ marginLeft: 8 }}>
+            View
+          </Link>
+        </div>
+      )}
 
       {!loading && !error && (
         <table
