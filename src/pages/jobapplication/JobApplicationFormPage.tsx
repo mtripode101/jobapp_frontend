@@ -9,6 +9,7 @@ import { JobApplicationDto } from "../../types/jobApplicationDto";
 import { CandidateDto } from "../../types/candidate";
 import { CompanyDto } from "../../types/company";
 import { PositionDto } from "../../types/position";
+import { useDebounce } from "../utils/useDebounce";
 
 const EMPTY_CANDIDATE: CandidateDto = {
   id: 0,
@@ -50,6 +51,15 @@ export default function JobApplicationFormPage() {
   const [companies, setCompanies] = useState<CompanyDto[]>([]);
   const [positions, setPositions] = useState<PositionDto[]>([]);
   const navigate = useNavigate();
+
+  // Local filter inputs
+  const [candidateQuery, setCandidateQuery] = useState("");
+  const [companyQuery, setCompanyQuery] = useState("");
+  const [positionQuery, setPositionQuery] = useState("");
+
+  const debouncedCandidate = useDebounce(candidateQuery, 200);
+  const debouncedCompany = useDebounce(companyQuery, 200);
+  const debouncedPosition = useDebounce(positionQuery, 200);
 
   useEffect(() => {
     let cancelled = false;
@@ -110,15 +120,41 @@ export default function JobApplicationFormPage() {
         console.error("Failed to create application:", err);
 
         if (err.response?.status === 409) {
-          // El backend devuelve 409 Conflict si el JobId ya existe
           alert(`This Job ID (${formData.jobId}) already exists. Please use another.`);
         } else if (err.response?.status === 400) {
-          // Si decides devolver 400 Bad Request en el backend
           alert(err.response?.data?.message || "Invalid request data");
         } else {
           alert(err?.message || "Failed to create application");
         }
       });
+  };
+
+  // Local filtering logic
+  const filteredCandidates = candidates.filter((c) =>
+    `${c.fullName} ${c.email || ""}`.toLowerCase().includes(debouncedCandidate.toLowerCase())
+  );
+
+  const filteredCompanies = companies.filter((c) =>
+    `${c.name} ${c.website || ""}`.toLowerCase().includes(debouncedCompany.toLowerCase())
+  );
+
+  const filteredPositions = positions.filter((p) =>
+    `${p.title} ${p.companyName} ${p.location}`.toLowerCase().includes(debouncedPosition.toLowerCase())
+  );
+
+  const selectCandidate = (c: CandidateDto) => {
+    setFormData({ ...formData, candidate: c });
+    setCandidateQuery(`${c.fullName} (${c.email || "N/A"})`);
+  };
+
+  const selectCompany = (c: CompanyDto) => {
+    setFormData({ ...formData, company: c });
+    setCompanyQuery(`${c.name}`);
+  };
+
+  const selectPosition = (p: PositionDto) => {
+    setFormData({ ...formData, position: p });
+    setPositionQuery(`${p.title} - ${p.companyName}`);
   };
 
   return (
@@ -127,7 +163,6 @@ export default function JobApplicationFormPage() {
       <form onSubmit={handleSubmit}>
         {/* Source info */}
         <div>
-
           <div>
             <label>Job Id:</label>
             <input
@@ -162,67 +197,98 @@ export default function JobApplicationFormPage() {
           />
         </div>
 
-        {/* Candidate selection */}
+        {/* Candidate selection (local filter) */}
         <div>
           <label>Select Candidate:</label>
-          <select
-            value={formData.candidate?.id ?? ""}
+          <input
+            type="text"
+            value={candidateQuery}
             onChange={(e) => {
-              const id = Number(e.target.value);
-              const selected = candidates.find((c) => c.id === id) || EMPTY_CANDIDATE;
-              setFormData({ ...formData, candidate: selected });
+              setCandidateQuery(e.target.value);
+              // clear selection if user edits query
+              if (formData.candidate?.id) setFormData({ ...formData, candidate: EMPTY_CANDIDATE });
             }}
-            required
-          >
-            <option value="">-- Choose a candidate --</option>
-            {candidates.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.fullName} ({c.email || "N/A"})
-              </option>
-            ))}
-          </select>
+            placeholder="Type to filter candidates by name or email"
+            aria-label="Search candidates"
+          />
+          <div>
+            <ul style={{ listStyle: "none", paddingLeft: 0, maxHeight: 160, overflowY: "auto" }}>
+              {filteredCandidates.slice(0, 10).map((c) => (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    onClick={() => selectCandidate(c)}
+                    style={{ display: "block", width: "100%", textAlign: "left" }}
+                  >
+                    {c.fullName} ({c.email || "N/A"})
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {debouncedCandidate && filteredCandidates.length === 0 && <small>No candidates found.</small>}
+          </div>
         </div>
 
-        {/* Company selection */}
+        {/* Company selection (local filter) */}
         <div>
           <label>Select Company:</label>
-          <select
-            value={formData.company?.id ?? ""}
+          <input
+            type="text"
+            value={companyQuery}
             onChange={(e) => {
-              const id = Number(e.target.value);
-              const selected = companies.find((c) => c.id === id) || EMPTY_COMPANY;
-              setFormData({ ...formData, company: selected });
+              setCompanyQuery(e.target.value);
+              if (formData.company?.id) setFormData({ ...formData, company: EMPTY_COMPANY });
             }}
-            required
-          >
-            <option value="">-- Choose a company --</option>
-            {companies.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name} ({c.website || "N/A"})
-              </option>
-            ))}
-          </select>
+            placeholder="Type to filter companies by name or website"
+            aria-label="Search companies"
+          />
+          <div>
+            <ul style={{ listStyle: "none", paddingLeft: 0, maxHeight: 160, overflowY: "auto" }}>
+              {filteredCompanies.slice(0, 10).map((c) => (
+                <li key={c.id}>
+                  <button
+                    type="button"
+                    onClick={() => selectCompany(c)}
+                    style={{ display: "block", width: "100%", textAlign: "left" }}
+                  >
+                    {c.name} ({c.website || "N/A"})
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {debouncedCompany && filteredCompanies.length === 0 && <small>No companies found.</small>}
+          </div>
         </div>
 
-        {/* Position selection */}
+        {/* Position selection (local filter) */}
         <div>
           <label>Select Position:</label>
-          <select
-            value={formData.position?.id ?? ""}
+          <input
+            type="text"
+            value={positionQuery}
             onChange={(e) => {
-              const id = Number(e.target.value);
-              const selected = positions.find((p) => p.id === id) || EMPTY_POSITION;
-              setFormData({ ...formData, position: selected });
+              setPositionQuery(e.target.value);
+              if (formData.position?.id) setFormData({ ...formData, position: EMPTY_POSITION });
             }}
-            required
-          >
-            <option value="">-- Choose a position --</option>
-            {positions.map((p) => (
-              <option key={p.id} value={p.id}>
-                {p.title} - {p.companyName} ({p.location})
-              </option>
-            ))}
-          </select>
+            placeholder="Type to filter positions by title, company or location"
+            aria-label="Search positions"
+          />
+          <div>
+            <ul style={{ listStyle: "none", paddingLeft: 0, maxHeight: 160, overflowY: "auto" }}>
+              {filteredPositions.slice(0, 10).map((p) => (
+                <li key={p.id}>
+                  <button
+                    type="button"
+                    onClick={() => selectPosition(p)}
+                    style={{ display: "block", width: "100%", textAlign: "left" }}
+                  >
+                    {p.title} - {p.companyName} ({p.location})
+                  </button>
+                </li>
+              ))}
+            </ul>
+            {debouncedPosition && filteredPositions.length === 0 && <small>No positions found.</small>}
+          </div>
         </div>
 
         {/* Status */}
@@ -230,7 +296,9 @@ export default function JobApplicationFormPage() {
           <label>Status:</label>
           <select
             value={formData.status}
-            onChange={(e) => setFormData({ ...formData, status: e.target.value as JobApplicationDto["status"] })}
+            onChange={(e) =>
+              setFormData({ ...formData, status: e.target.value as JobApplicationDto["status"] })
+            }
           >
             <option value="Applied">Applied</option>
             <option value="Rejected">Rejected</option>
