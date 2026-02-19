@@ -10,7 +10,7 @@ import { getCandidates } from "../../services/candidateService";
 import { getCompanies } from "../../services/companyService";
 import { positionService } from "../../services/positionService";
 import { InterviewDto } from "../../types/interviewDto";
-import { JobOfferDto } from "../../types/jobOfferDto"; // 👈 nuevo import
+import { JobOfferDto } from "../../types/jobOfferDto"; 
 
 export default function JobApplicationEditPage() {
   const { id } = useParams<{ id: string }>();
@@ -25,9 +25,10 @@ export default function JobApplicationEditPage() {
     if (id) {
       jobApplicationService.getById(Number(id))
         .then((data) => setFormData(data))
-        .catch((err) => {
+        .catch((err: any) => {
           console.error("Failed to load application:", err);
-          alert("Application not found");
+          const errorMessage = err.response?.data?.message || "Application not found";
+          alert(errorMessage);
           navigate("/applications");
         });
     }
@@ -48,7 +49,8 @@ export default function JobApplicationEditPage() {
       })
       .catch((err: any) => {
         console.error("Failed to update application:", err);
-        alert(err?.message || "Failed to update application");
+        const errorMessage = err.response?.data?.message || "Failed to update application";
+        alert(errorMessage);
       });
   };
 
@@ -108,7 +110,6 @@ export default function JobApplicationEditPage() {
             <option value="OFFERED">Offered</option>
             <option value="INTERVIEW SCHEDULED">Interview Scheduled</option>
             <option value="HIRED">Hired</option>
-
           </select>
         </div>
 
