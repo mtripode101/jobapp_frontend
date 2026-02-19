@@ -1,0 +1,17 @@
+graph TB
+    subgraph "Modules"
+        src[src]
+    end
+
+    subgraph "External Libraries"
+        react_router_dom[react-router-dom]
+        _testing_library_react[@testing-library/react]
+        react[react]
+        react_dom_client[react-dom/client]
+        react_router_dom[react-router-dom]
+    end
+
+
+    classDef moduleStyle fill:#e1f5ff,stroke:#0066cc
+    classDef serviceStyle fill:#ffe1e1,stroke:#cc0000
+    classDef libraryStyle fill:#e1ffe1,stroke:#00cc00

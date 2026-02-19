@@ -1,0 +1,14 @@
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Processing: start
+    Processing --> Success: complete
+    Processing --> Error: fail
+    Success --> [*]
+    Error --> Idle: retry
+    Error --> [*]: abort
+
+    state Processing {
+        [*] --> Validating
+        Validating --> Executing
+        Executing --> [*]
+    }

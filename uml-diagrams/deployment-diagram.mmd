@@ -1,0 +1,37 @@
+graph TB
+    subgraph "Client Tier"
+        Browser[Web Browser]
+        Mobile[Mobile App]
+    end
+
+    subgraph "Application Server"
+        WebServer[Web Server]
+        AppServer[Application Server]
+        src[src]
+    end
+
+    subgraph "Data Tier"
+        Database[(Database Server)]
+        Cache[(Cache Server)]
+    end
+
+    subgraph "External Services"
+        react_router_dom[react-router-dom]
+        _testing_library_react[@testing-library/react]
+        react[react]
+    end
+
+    Browser --> WebServer
+    Mobile --> WebServer
+    WebServer --> AppServer
+    AppServer --> src
+    src --> Database
+    AppServer --> Cache
+    AppServer --> react_router_dom
+    AppServer --> _testing_library_react
+    AppServer --> react
+
+    style Browser fill:#e1f5ff
+    style Mobile fill:#e1f5ff
+    style Database fill:#ffe1e1
+    style Cache fill:#ffe1e1

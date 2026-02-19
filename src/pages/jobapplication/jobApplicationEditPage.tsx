@@ -106,7 +106,7 @@ export default function JobApplicationEditPage() {
             <option value="REJECTED">Rejected</option>
             <option value="INTERVIEWED">Interviewed</option>
             <option value="OFFERED">Offered</option>
-            <option value="INTERVIEW_SCHEDULED">Interview Scheduled</option>
+            <option value="INTERVIEW SCHEDULED">Interview Scheduled</option>
             <option value="HIRED">Hired</option>
 
           </select>
