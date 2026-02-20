@@ -6,6 +6,19 @@ import { PositionDto } from "./position";
 import { InterviewDto } from "./interviewDto"; 
 import { JobOfferDto } from "./jobOfferDto";
 
+export interface CommentDto {
+  author: string;
+  message: string;
+}
+
+export interface NoteDto {
+  id?: string | null;
+  title: string;
+  content: string;
+  comments?: CommentDto[];
+  applicationId?: number;
+}
+
 export interface JobApplicationDto extends BaseDto {
   jobId: string;
   dateApplied: string;
@@ -18,4 +31,5 @@ export interface JobApplicationDto extends BaseDto {
   status: "APPLIED" | "REJECTED" | "INTERVIEWED" | "OFFERED" | "INTERVIEW_SCHEDULED" | "HIRED";
   interviews?: InterviewDto[];
   offers?: JobOfferDto[];
+  notes?: NoteDto[];
 }
