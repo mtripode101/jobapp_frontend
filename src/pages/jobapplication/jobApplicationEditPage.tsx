@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { jobApplicationService } from "../../services/jobApplicationService";
-import { JobApplicationDto } from "../../types/jobApplicationDto";
+import { JobApplicationDto, NoteDto } from "../../types/jobApplicationDto";
 import { CandidateDto } from "../../types/candidate";
 import { CompanyDto } from "../../types/company";
 import { PositionDto } from "../../types/position";
@@ -10,7 +10,7 @@ import { getCandidates } from "../../services/candidateService";
 import { getCompanies } from "../../services/companyService";
 import { positionService } from "../../services/positionService";
 import { InterviewDto } from "../../types/interviewDto";
-import { JobOfferDto } from "../../types/jobOfferDto"; 
+import { JobOfferDto } from "../../types/jobOfferDto";
 
 export default function JobApplicationEditPage() {
   const { id } = useParams<{ id: string }>();
@@ -21,10 +21,17 @@ export default function JobApplicationEditPage() {
   const [companies, setCompanies] = useState<CompanyDto[]>([]);
   const [positions, setPositions] = useState<PositionDto[]>([]);
 
+  // States for new note
+  const [newNoteTitle, setNewNoteTitle] = useState("");
+  const [newNoteContent, setNewNoteContent] = useState("");
+
   useEffect(() => {
     if (id) {
       jobApplicationService.getById(Number(id))
-        .then((data) => setFormData(data))
+        .then((data) => {
+          // Initialize notes as [] if null
+          setFormData({ ...data, notes: data.notes || [] });
+        })
         .catch((err: any) => {
           console.error("Failed to load application:", err);
           const errorMessage = err.response?.data?.message || "Application not found";
@@ -42,6 +49,7 @@ export default function JobApplicationEditPage() {
     e.preventDefault();
     if (!formData) return;
 
+    // 🔹 Send the full DTO including notes
     jobApplicationService.update(formData.id!, formData)
       .then(() => {
         alert("Application updated successfully!");
@@ -54,13 +62,34 @@ export default function JobApplicationEditPage() {
       });
   };
 
+  const handleAddNote = () => {
+    if (!formData) return;
+
+    const newNote: NoteDto = {
+      id: null, // backend will assign ID
+      title: newNoteTitle,
+      content: newNoteContent,
+      applicationId: formData.id!,
+      comments: []
+    };
+
+    // 🔹 Only update local state, avoid duplicates
+    setFormData({
+      ...formData,
+      notes: [...(formData.notes || []), newNote],
+    });
+
+    setNewNoteTitle("");
+    setNewNoteContent("");
+  };
+
   if (!formData) return <p>Loading...</p>;
 
   return (
     <div>
       <h2>Edit Job Application</h2>
+      {/* Main form only for application */}
       <form onSubmit={handleSubmit}>
-        {/* campos de edición */}
         <div>
           <label>Job Id:</label>
           <input
@@ -108,7 +137,7 @@ export default function JobApplicationEditPage() {
             <option value="REJECTED">Rejected</option>
             <option value="INTERVIEWED">Interviewed</option>
             <option value="OFFERED">Offered</option>
-            <option value="INTERVIEW SCHEDULED">Interview Scheduled</option>
+            <option value="INTERVIEW_SCHEDULED">Interview Scheduled</option>
             <option value="HIRED">Hired</option>
           </select>
         </div>
@@ -116,7 +145,40 @@ export default function JobApplicationEditPage() {
         <button type="submit">Update Application</button>
       </form>
 
-      {/* 🔹 Interviews linked to this application */}
+      {/* Notes Section */}
+      <div style={{ marginTop: "20px" }}>
+        <h3>Notes</h3>
+        {formData.notes && formData.notes.length > 0 ? (
+          <ul>
+            {formData.notes.map((note, idx) => (
+              <li key={idx}>
+                <strong>{note.title}</strong>: {note.content}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No notes linked to this application</p>
+        )}
+
+        <div>
+          <label>Title:</label>
+          <input
+            type="text"
+            value={newNoteTitle}
+            onChange={(e) => setNewNoteTitle(e.target.value)}
+          />
+        </div>
+        <div>
+          <label>Content:</label>
+          <textarea
+            value={newNoteContent}
+            onChange={(e) => setNewNoteContent(e.target.value)}
+          />
+        </div>
+        <button type="button" onClick={handleAddNote}>Add Note</button>
+      </div>
+
+      {/* Interviews */}
       <div style={{ marginTop: "20px" }}>
         <h3>Interviews</h3>
         {formData.interviews && formData.interviews.length > 0 ? (
@@ -133,7 +195,7 @@ export default function JobApplicationEditPage() {
         )}
       </div>
 
-      {/* 🔹 Offers linked to this application */}
+      {/* Offers */}
       <div style={{ marginTop: "20px" }}>
         <h3>Job Offers</h3>
         {formData.offers && formData.offers.length > 0 ? (
