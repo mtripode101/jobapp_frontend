@@ -1,12 +1,8 @@
 #!/bin/sh
-# Reemplaza variables en tiempo de ejecución usando envsubst
-# Si no existe env.template, simplemente arranca nginx
-TEMPLATE="/usr/share/nginx/html/env.template"
-OUT="/usr/share/nginx/html/env.js"
+set -eu
 
-if [ -f "$TEMPLATE" ]; then
-  # Genera env.js con las variables de entorno disponibles
-  /bin/sh -c "envsubst '\$API_URL' < $TEMPLATE > $OUT"
-fi
+# Sustituye variables en runtime
+envsubst '${API_URL} ${API_UPSTREAM}' < /usr/share/nginx/html/env.template > /usr/share/nginx/html/env.js
+envsubst '${API_UPSTREAM}' < /etc/nginx/conf.d/default.conf.template > /etc/nginx/conf.d/default.conf
 
 exec "$@"
