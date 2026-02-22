@@ -3,17 +3,17 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: jobapp-frontend:dev
-    container_name: jobapp-frontend-dev
+    image: jobapp-frontend:local
+    container_name: jobapp-frontend-local
     ports:
-      - "3000:80"
+      - "3002:80"
     environment:
       API_URL: "/api"
-      API_UPSTREAM: "http://jobapp-backend-dev:8080"
+      API_UPSTREAM: "http://jobapp-backend-local:8080"
     restart: unless-stopped
     networks:
-      - jobapp-net
+      - jobapp-net-local
 
 networks:
-  jobapp-net:
+  jobapp-net-local:
     external: true

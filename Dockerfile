@@ -1,23 +1,19 @@
-# Stage 1: build the frontend (Node)
+# Stage 1: build React app
 FROM node:18-alpine AS build
 WORKDIR /app
-
-# Copiar package files para cachear dependencias
-COPY package.json package-lock.json* yarn.lock* ./
-RUN if [ -f yarn.lock ]; then yarn --frozen-lockfile --production=false --verbose; else npm ci --verbose; fi
-
-# Copiar el resto del código y compilar
+COPY package*.json ./
+RUN npm install --legacy-peer-deps
 COPY . .
-# Asume script "build" en package.json que genera la carpeta build (React)
-RUN npm run build --if-present
+RUN npm run build
 
-# Stage 2: servir con nginx
+# Stage 2: serve with nginx
 FROM nginx:stable-alpine
-# Copia los archivos estáticos generados (React crea /app/build)
-COPY --from=build /app/build /usr/share/nginx/html
 
-# Copiar configuración nginx y entrypoint para inyección runtime de variables
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+RUN apk add --no-cache gettext
+
+COPY --from=build /app/build /usr/share/nginx/html
+COPY env.template /usr/share/nginx/html/env.template
+COPY nginx.conf.template /etc/nginx/conf.d/default.conf.template
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 RUN chmod +x /docker-entrypoint.sh
 
