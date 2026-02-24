@@ -2,7 +2,7 @@
 import axios from "axios";
 import { JobApplicationDto } from "../types/jobApplicationDto";
 
-const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8080";
+const API_URL = process.env.REACT_APP_API_URL || "/api";
 
 const handleResponse = <T>(promise: Promise<any>): Promise<T> =>
   promise.then((res) => res.data).catch((err) => {
