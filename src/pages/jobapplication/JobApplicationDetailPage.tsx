@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { jobApplicationService } from "../../services/jobApplicationService";
-import { JobApplicationDto } from "../../types/jobApplicationDto";
+import { JobApplicationDto, NoteDto } from "../../types/jobApplicationDto";
 import { InterviewDto } from "../../types/interviewDto";
 import { JobOfferDto } from "../../types/jobOfferDto";
 
@@ -12,7 +12,10 @@ export default function JobApplicationDetailPage() {
 
   useEffect(() => {
     if (id) {
-      jobApplicationService.getById(Number(id)).then(setApplication);
+      jobApplicationService.getById(Number(id)).then((data) => {
+        // Initialize notes as [] if null (same as Edit)
+        setApplication({ ...data, notes: data.notes || [] });
+      });
     }
   }, [id]);
 
@@ -24,11 +27,30 @@ export default function JobApplicationDetailPage() {
       <p><strong>JobID:</strong> {application.jobId}</p>
       <p><strong>Candidate:</strong> {application.candidate?.fullName}</p>
       <p><strong>Company:</strong> {application.company?.name}</p>
-      <p><strong>Position:</strong> {application.position?.title} - {application.position.location}</p>
+      <p>
+        <strong>Position:</strong> {application.position?.title} -{" "}
+        {application.position.location}
+      </p>
       <p><strong>Status:</strong> {application.status}</p>
       <p><strong>Description:</strong> {application.description}</p>
       <p><strong>Source Link:</strong> {application.sourceLink}</p>
       <p><strong>Date Applied:</strong> {application.dateApplied}</p>
+
+      {/* 🔹 Notes linked to this application (read-only) */}
+      <div style={{ marginTop: "20px" }}>
+        <h3>Notes</h3>
+        {application.notes && application.notes.length > 0 ? (
+          <ul>
+            {application.notes.map((note: NoteDto, idx: number) => (
+              <li key={note.id ?? idx}>
+                <strong>{note.title}</strong>: {note.content}
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No notes linked to this application</p>
+        )}
+      </div>
 
       {/* 🔹 Interviews linked to this application */}
       <div style={{ marginTop: "20px" }}>
@@ -54,9 +76,14 @@ export default function JobApplicationDetailPage() {
           <ul>
             {application.offers.map((offer: JobOfferDto) => (
               <li key={offer.id}>
-                Offered At: {new Date(offer.offeredAt).toLocaleDateString()} — Status: {offer.status}
-                {offer.expectedSalary !== null && <span> | Expected: {offer.expectedSalary}</span>}
-                {offer.offeredSalary !== null && <span> | Offered: {offer.offeredSalary}</span>}
+                Offered At: {new Date(offer.offeredAt).toLocaleDateString()} —{" "}
+                Status: {offer.status}
+                {offer.expectedSalary !== null && (
+                  <span> | Expected: {offer.expectedSalary}</span>
+                )}
+                {offer.offeredSalary !== null && (
+                  <span> | Offered: {offer.offeredSalary}</span>
+                )}
               </li>
             ))}
           </ul>
