@@ -1,10 +1,10 @@
 // src/pages/joboffer/JobOfferListPage.tsx
 import React, { useEffect, useState } from "react";
-import { jobOfferService } from "../../services/jobOfferService";
-import { jobApplicationService } from "../../services/jobApplicationService";
-import { JobOfferDto } from "../../types/jobOfferDto";
-import { JobApplicationDto } from "../../types/jobApplicationDto";
 import { Link } from "react-router-dom";
+import { jobApplicationService } from "../../services/jobApplicationService";
+import { jobOfferService } from "../../services/jobOfferService";
+import { JobApplicationDto } from "../../types/jobApplicationDto";
+import { JobOfferDto } from "../../types/jobOfferDto";
 
 export default function JobOfferListPage() {
   const [offers, setOffers] = useState<JobOfferDto[]>([]);
@@ -12,6 +12,8 @@ export default function JobOfferListPage() {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [processingId, setProcessingId] = useState<number | null>(null);
+  const [candidateFilter, setCandidateFilter] = useState<string>("");
+  const [companyFilter, setCompanyFilter] = useState<string>("");
 
   const normalizeOffersAndApps = (rawOffers: any, rawApps: any) => {
     const offersArray: any[] = Array.isArray(rawOffers)
@@ -64,7 +66,7 @@ export default function JobOfferListPage() {
         updatedAt: o.updatedAt,
         offeredAt: o.offeredAt,
         status: o.status,
-        applicationId: applicationId,
+        applicationId,
         application: applicationObj ?? undefined,
         expectedSalary: o.expectedSalary ?? null,
         offeredSalary: o.offeredSalary ?? null,
@@ -116,7 +118,7 @@ export default function JobOfferListPage() {
   };
 
   const formatDate = (isoDate?: string) => {
-    if (!isoDate) return "—";
+    if (!isoDate) return "-";
     try {
       const d = new Date(isoDate);
       return d.toLocaleDateString();
@@ -165,18 +167,45 @@ export default function JobOfferListPage() {
     }
   };
 
+  const filteredOffers = offers.filter((offer) => {
+    const app = offer.applicationId ? applicationsMap[offer.applicationId] : undefined;
+    const candidateName = app?.candidate?.fullName?.toLowerCase() ?? "";
+    const companyName = app?.company?.name?.toLowerCase() ?? "";
+
+    return (
+      candidateName.includes(candidateFilter.toLowerCase()) &&
+      companyName.includes(companyFilter.toLowerCase())
+    );
+  });
+
   return (
     <div>
       <h2>Job Offers</h2>
 
-      <Link to="/job-offers/new">➕ Create Offer</Link>
+      <Link to="/job-offers/new">Create Offer</Link>
+
+      <div style={{ margin: "12px 0" }}>
+        <input
+          type="text"
+          placeholder="Filter by candidate"
+          value={candidateFilter}
+          onChange={(e) => setCandidateFilter(e.target.value)}
+          style={{ marginRight: 8 }}
+        />
+        <input
+          type="text"
+          placeholder="Filter by company"
+          value={companyFilter}
+          onChange={(e) => setCompanyFilter(e.target.value)}
+        />
+      </div>
 
       {loading && <p>Loading job offers...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {!loading && offers.length === 0 && <p>No job offers found</p>}
+      {!loading && filteredOffers.length === 0 && <p>No job offers found</p>}
 
-      {!loading && offers.length > 0 && (
+      {!loading && filteredOffers.length > 0 && (
         <table border={1} style={{ width: "100%", marginTop: 20 }}>
           <thead>
             <tr>
@@ -192,7 +221,7 @@ export default function JobOfferListPage() {
             </tr>
           </thead>
           <tbody>
-            {offers.map((offer) => {
+            {filteredOffers.map((offer) => {
               const app = offer.applicationId ? applicationsMap[offer.applicationId] : undefined;
               return (
                 <tr key={offer.id}>
@@ -201,21 +230,21 @@ export default function JobOfferListPage() {
                     {app?.candidate?.fullName ? (
                       <Link to={`/applications/${app.id}`}>{app.candidate.fullName}</Link>
                     ) : (
-                      app ? "—" : <span>Application #{offer.applicationId}</span>
+                      app ? "-" : <span>Application #{offer.applicationId}</span>
                     )}
                   </td>
-                  <td>{app?.company?.name ?? "—"}</td>
-                  <td>{app?.position?.title ?? "—"}</td>
+                  <td>{app?.company?.name ?? "-"}</td>
+                  <td>{app?.position?.title ?? "-"}</td>
                   <td>{formatDate(offer.offeredAt)}</td>
-                  <td>{offer.expectedSalary != null ? `$${offer.expectedSalary}` : "—"}</td>
-                  <td>{offer.offeredSalary != null ? `$${offer.offeredSalary}` : "—"}</td>
-                  <td>{offer.status ?? "—"}</td>
+                  <td>{offer.expectedSalary != null ? `$${offer.expectedSalary}` : "-"}</td>
+                  <td>{offer.offeredSalary != null ? `$${offer.offeredSalary}` : "-"}</td>
+                  <td>{offer.status ?? "-"}</td>
                   <td>
                     <Link to={`/job-offers/${offer.id}`} style={{ marginRight: 8 }}>
-                      🔍 Detail
+                      Detail
                     </Link>
                     <Link to={`/job-offers/${offer.id}/edit`} style={{ marginRight: 8 }}>
-                      ✏️ Edit
+                      Edit
                     </Link>
                     {offer.status !== "ACCEPTED" && (
                       <button
@@ -257,3 +286,4 @@ export default function JobOfferListPage() {
     </div>
   );
 }
+
