@@ -1,7 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { Link } from "react-router-dom";
 import { jobApplicationService } from "../../services/jobApplicationService";
 import { JobApplicationDto } from "../../types/jobApplicationDto";
-import { Link } from "react-router-dom";
+
+type SortDirection = "asc" | "desc";
+type SortKey = "jobId" | "candidate" | "company" | "position" | "status" | "dateApplied";
 
 export default function JobApplicationListPage() {
   const [applications, setApplications] = useState<JobApplicationDto[]>([]);
@@ -10,24 +13,25 @@ export default function JobApplicationListPage() {
   const [loading, setLoading] = useState(false);
   const [inputPage, setInputPage] = useState("1");
 
-  // 🔹 Filters
   const [candidateFilter, setCandidateFilter] = useState("");
   const [companyFilter, setCompanyFilter] = useState("");
   const [statusFilter, setStatusFilter] = useState("");
 
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection } | null>(null);
+
   useEffect(() => {
     setLoading(true);
-    jobApplicationService.getPaged(page, 15) // 👈 ahora 15 por página
+    jobApplicationService
+      .getPaged(page, 15)
       .then((data) => {
         setApplications(data.content);
         setTotalPages(data.totalPages);
-        setLoading(false);
         setInputPage((page + 1).toString());
       })
       .catch((err) => {
         console.error("Failed to fetch applications:", err);
-        setLoading(false);
-      });
+      })
+      .finally(() => setLoading(false));
   }, [page]);
 
   const handleDelete = (id: number) => {
@@ -58,26 +62,76 @@ export default function JobApplicationListPage() {
     }
   };
 
-  // 🔹 Apply filters
-  const filteredApplications = applications.filter((app) => {
-    const candidateName = app.candidate?.fullName?.toLowerCase() || "";
-    const companyName = (app.company?.name || app.position?.companyName || "").toLowerCase();
-    const status = app.status?.toLowerCase() || "";
+  const filteredApplications = useMemo(() => {
+    return applications.filter((app) => {
+      const candidateName = app.candidate?.fullName?.toLowerCase() || "";
+      const companyName = (app.company?.name || app.position?.companyName || "").toLowerCase();
+      const status = app.status?.toLowerCase() || "";
 
-    return (
-      candidateName.includes(candidateFilter.toLowerCase()) &&
-      companyName.includes(companyFilter.toLowerCase()) &&
-      status.includes(statusFilter.toLowerCase())
-    );
+      return (
+        candidateName.includes(candidateFilter.toLowerCase()) &&
+        companyName.includes(companyFilter.toLowerCase()) &&
+        status.includes(statusFilter.toLowerCase())
+      );
+    });
+  }, [applications, candidateFilter, companyFilter, statusFilter]);
+
+  const getSortValue = (app: JobApplicationDto, key: SortKey): string | number => {
+    switch (key) {
+      case "jobId":
+        return app.jobId || "";
+      case "candidate":
+        return app.candidate?.fullName || "";
+      case "company":
+        return app.company?.name || app.position?.companyName || "";
+      case "position":
+        return app.position?.title || "";
+      case "status":
+        return app.status || "";
+      case "dateApplied":
+        return app.dateApplied ? new Date(app.dateApplied).getTime() : 0;
+      default:
+        return "";
+    }
+  };
+
+  const sortedApplications = useMemo(() => {
+    if (!sortConfig) return filteredApplications;
+
+    const sorted = [...filteredApplications];
+    sorted.sort((a, b) => {
+      const aValue = getSortValue(a, sortConfig.key);
+      const bValue = getSortValue(b, sortConfig.key);
+
+      if (typeof aValue === "number" && typeof bValue === "number") {
+        return sortConfig.direction === "asc" ? aValue - bValue : bValue - aValue;
+      }
+
+      const result = String(aValue).localeCompare(String(bValue), undefined, { sensitivity: "base" });
+      return sortConfig.direction === "asc" ? result : -result;
+    });
+
+    return sorted;
+  }, [filteredApplications, sortConfig]);
+
+  const setSort = (key: SortKey, direction: SortDirection) => {
+    setSortConfig({ key, direction });
+  };
+
+  const arrowStyle = (key: SortKey, direction: SortDirection): React.CSSProperties => ({
+    marginLeft: 6,
+    padding: "2px 6px",
+    fontSize: 11,
+    lineHeight: 1,
+    fontWeight: sortConfig?.key === key && sortConfig.direction === direction ? 700 : 400,
   });
 
   return (
     <div>
       <h2>Job Applications</h2>
 
-      <Link to="/applications/new">➕ Create Application</Link>
+      <Link to="/applications/new">Create Application</Link>
 
-      {/* 🔹 Filter controls */}
       <div style={{ margin: "12px 0" }}>
         <input
           type="text"
@@ -108,17 +162,41 @@ export default function JobApplicationListPage() {
           <table border={1} style={{ width: "100%", marginTop: "20px" }}>
             <thead>
               <tr>
-                <th>JobID</th>
-                <th>Candidate</th>
-                <th>Company</th>
-                <th>Position</th>
-                <th>Status</th>
-                <th>Date Applied</th>
+                <th>
+                  JobID
+                  <button type="button" onClick={() => setSort("jobId", "asc")} style={arrowStyle("jobId", "asc")}>{"\u25B2"}</button>
+                  <button type="button" onClick={() => setSort("jobId", "desc")} style={arrowStyle("jobId", "desc")}>{"\u25BC"}</button>
+                </th>
+                <th>
+                  Candidate
+                  <button type="button" onClick={() => setSort("candidate", "asc")} style={arrowStyle("candidate", "asc")}>{"\u25B2"}</button>
+                  <button type="button" onClick={() => setSort("candidate", "desc")} style={arrowStyle("candidate", "desc")}>{"\u25BC"}</button>
+                </th>
+                <th>
+                  Company
+                  <button type="button" onClick={() => setSort("company", "asc")} style={arrowStyle("company", "asc")}>{"\u25B2"}</button>
+                  <button type="button" onClick={() => setSort("company", "desc")} style={arrowStyle("company", "desc")}>{"\u25BC"}</button>
+                </th>
+                <th>
+                  Position
+                  <button type="button" onClick={() => setSort("position", "asc")} style={arrowStyle("position", "asc")}>{"\u25B2"}</button>
+                  <button type="button" onClick={() => setSort("position", "desc")} style={arrowStyle("position", "desc")}>{"\u25BC"}</button>
+                </th>
+                <th>
+                  Status
+                  <button type="button" onClick={() => setSort("status", "asc")} style={arrowStyle("status", "asc")}>{"\u25B2"}</button>
+                  <button type="button" onClick={() => setSort("status", "desc")} style={arrowStyle("status", "desc")}>{"\u25BC"}</button>
+                </th>
+                <th>
+                  Date Applied
+                  <button type="button" onClick={() => setSort("dateApplied", "asc")} style={arrowStyle("dateApplied", "asc")}>{"\u25B2"}</button>
+                  <button type="button" onClick={() => setSort("dateApplied", "desc")} style={arrowStyle("dateApplied", "desc")}>{"\u25BC"}</button>
+                </th>
                 <th>Actions</th>
               </tr>
             </thead>
             <tbody>
-              {filteredApplications.map((app) => (
+              {sortedApplications.map((app) => (
                 <tr key={app.id}>
                   <td>{app.jobId}</td>
                   <td>{app.candidate?.fullName}</td>
@@ -127,15 +205,12 @@ export default function JobApplicationListPage() {
                   <td>{app.status}</td>
                   <td>{new Date(app.dateApplied).toLocaleDateString()}</td>
                   <td>
-                    <Link to={`/applications/${app.id}`}>🔍 Detail</Link>{" "}
+                    <Link to={`/applications/${app.id}`}>Detail</Link>{" "}
                     <Link to={`/applications/${app.id}/edit`} style={{ marginLeft: "10px", color: "blue" }}>
-                      ✏️ Edit
+                      Edit
                     </Link>
-                    <button
-                      style={{ marginLeft: "10px", color: "red" }}
-                      onClick={() => handleDelete(app.id!)}
-                    >
-                      🗑️ Delete
+                    <button style={{ marginLeft: "10px", color: "red" }} onClick={() => handleDelete(app.id!)}>
+                      Delete
                     </button>
                   </td>
                 </tr>
@@ -143,19 +218,15 @@ export default function JobApplicationListPage() {
             </tbody>
           </table>
 
-          {/* 🔹 Pagination Controls */}
           <div style={{ marginTop: "20px" }}>
             <button disabled={page === 0} onClick={() => setPage(page - 1)}>
-              ⬅️ Prev
+              Prev
             </button>
             <span style={{ margin: "0 10px" }}>
               Page {page + 1} of {totalPages}
             </span>
-            <button
-              disabled={page >= totalPages - 1}
-              onClick={() => setPage(page + 1)}
-            >
-              Next ➡️
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(page + 1)}>
+              Next
             </button>
 
             <div style={{ marginTop: "10px" }}>
@@ -175,3 +246,4 @@ export default function JobApplicationListPage() {
     </div>
   );
 }
+
