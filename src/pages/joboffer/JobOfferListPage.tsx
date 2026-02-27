@@ -1,10 +1,13 @@
 // src/pages/joboffer/JobOfferListPage.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { jobApplicationService } from "../../services/jobApplicationService";
 import { jobOfferService } from "../../services/jobOfferService";
 import { JobApplicationDto } from "../../types/jobApplicationDto";
 import { JobOfferDto } from "../../types/jobOfferDto";
+
+type SortDirection = "asc" | "desc";
+type SortKey = "candidate" | "company" | "position" | "offeredAt";
 
 export default function JobOfferListPage() {
   const [offers, setOffers] = useState<JobOfferDto[]>([]);
@@ -14,6 +17,7 @@ export default function JobOfferListPage() {
   const [processingId, setProcessingId] = useState<number | null>(null);
   const [candidateFilter, setCandidateFilter] = useState<string>("");
   const [companyFilter, setCompanyFilter] = useState<string>("");
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection } | null>(null);
 
   const normalizeOffersAndApps = (rawOffers: any, rawApps: any) => {
     const offersArray: any[] = Array.isArray(rawOffers)
@@ -178,6 +182,59 @@ export default function JobOfferListPage() {
     );
   });
 
+  const sortedOffers = useMemo(() => {
+    if (!sortConfig) return filteredOffers;
+
+    const sorted = [...filteredOffers];
+    sorted.sort((a, b) => {
+      const appA = a.applicationId ? applicationsMap[a.applicationId] : undefined;
+      const appB = b.applicationId ? applicationsMap[b.applicationId] : undefined;
+
+      const valueA = (() => {
+        switch (sortConfig.key) {
+          case "candidate":
+            return appA?.candidate?.fullName || "";
+          case "company":
+            return appA?.company?.name || "";
+          case "position":
+            return appA?.position?.title || "";
+          case "offeredAt":
+            return a.offeredAt ? new Date(a.offeredAt).getTime() : 0;
+        }
+      })();
+
+      const valueB = (() => {
+        switch (sortConfig.key) {
+          case "candidate":
+            return appB?.candidate?.fullName || "";
+          case "company":
+            return appB?.company?.name || "";
+          case "position":
+            return appB?.position?.title || "";
+          case "offeredAt":
+            return b.offeredAt ? new Date(b.offeredAt).getTime() : 0;
+        }
+      })();
+
+      if (typeof valueA === "number" && typeof valueB === "number") {
+        return sortConfig.direction === "asc" ? valueA - valueB : valueB - valueA;
+      }
+
+      const result = String(valueA).localeCompare(String(valueB), undefined, { sensitivity: "base" });
+      return sortConfig.direction === "asc" ? result : -result;
+    });
+
+    return sorted;
+  }, [filteredOffers, sortConfig, applicationsMap]);
+
+  const arrowStyle = (key: SortKey, direction: SortDirection): React.CSSProperties => ({
+    marginLeft: 6,
+    padding: "2px 6px",
+    fontSize: 11,
+    lineHeight: 1,
+    fontWeight: sortConfig?.key === key && sortConfig.direction === direction ? 700 : 400,
+  });
+
   return (
     <div>
       <h2>Job Offers</h2>
@@ -203,17 +260,49 @@ export default function JobOfferListPage() {
       {loading && <p>Loading job offers...</p>}
       {error && <p style={{ color: "red" }}>{error}</p>}
 
-      {!loading && filteredOffers.length === 0 && <p>No job offers found</p>}
+      {!loading && sortedOffers.length === 0 && <p>No job offers found</p>}
 
-      {!loading && filteredOffers.length > 0 && (
+      {!loading && sortedOffers.length > 0 && (
         <table border={1} style={{ width: "100%", marginTop: 20 }}>
           <thead>
             <tr>
               <th>ID</th>
-              <th>Candidate</th>
-              <th>Company</th>
-              <th>Position</th>
-              <th>Offered At</th>
+              <th>
+                Candidate
+                <button type="button" onClick={() => setSortConfig({ key: "candidate", direction: "asc" })} style={arrowStyle("candidate", "asc")}>
+                  {"\u25B2"}
+                </button>
+                <button type="button" onClick={() => setSortConfig({ key: "candidate", direction: "desc" })} style={arrowStyle("candidate", "desc")}>
+                  {"\u25BC"}
+                </button>
+              </th>
+              <th>
+                Company
+                <button type="button" onClick={() => setSortConfig({ key: "company", direction: "asc" })} style={arrowStyle("company", "asc")}>
+                  {"\u25B2"}
+                </button>
+                <button type="button" onClick={() => setSortConfig({ key: "company", direction: "desc" })} style={arrowStyle("company", "desc")}>
+                  {"\u25BC"}
+                </button>
+              </th>
+              <th>
+                Position
+                <button type="button" onClick={() => setSortConfig({ key: "position", direction: "asc" })} style={arrowStyle("position", "asc")}>
+                  {"\u25B2"}
+                </button>
+                <button type="button" onClick={() => setSortConfig({ key: "position", direction: "desc" })} style={arrowStyle("position", "desc")}>
+                  {"\u25BC"}
+                </button>
+              </th>
+              <th>
+                Offered At
+                <button type="button" onClick={() => setSortConfig({ key: "offeredAt", direction: "asc" })} style={arrowStyle("offeredAt", "asc")}>
+                  {"\u25B2"}
+                </button>
+                <button type="button" onClick={() => setSortConfig({ key: "offeredAt", direction: "desc" })} style={arrowStyle("offeredAt", "desc")}>
+                  {"\u25BC"}
+                </button>
+              </th>
               <th>Expected Salary</th>
               <th>Offered Salary</th>
               <th>Offer Status</th>
@@ -221,7 +310,7 @@ export default function JobOfferListPage() {
             </tr>
           </thead>
           <tbody>
-            {filteredOffers.map((offer) => {
+            {sortedOffers.map((offer) => {
               const app = offer.applicationId ? applicationsMap[offer.applicationId] : undefined;
               return (
                 <tr key={offer.id}>

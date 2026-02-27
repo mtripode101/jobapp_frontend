@@ -1,14 +1,18 @@
 // src/pages/PositionListPage.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { positionService } from "../../services/positionService";
 import { PositionDto } from "../../types/position";
+
+type SortDirection = "asc" | "desc";
+type SortKey = "title" | "location" | "company";
 
 export default function PositionListPage() {
   const [positions, setPositions] = useState<PositionDto[]>([]);
   const [titleFilter, setTitleFilter] = useState("");
   const [locationFilter, setLocationFilter] = useState("");
   const [companyFilter, setCompanyFilter] = useState("");
+  const [sortConfig, setSortConfig] = useState<{ key: SortKey; direction: SortDirection } | null>(null);
 
   useEffect(() => {
     positionService.getPositions().then(setPositions);
@@ -31,6 +35,44 @@ export default function PositionListPage() {
       location.includes(locationFilter.toLowerCase()) &&
       company.includes(companyFilter.toLowerCase())
     );
+  });
+
+  const sortedPositions = useMemo(() => {
+    if (!sortConfig) return filteredPositions;
+    const sorted = [...filteredPositions];
+    sorted.sort((a, b) => {
+      const valueA = (() => {
+        switch (sortConfig.key) {
+          case "title":
+            return a.title || "";
+          case "location":
+            return a.location || "";
+          case "company":
+            return a.companyName || "";
+        }
+      })();
+      const valueB = (() => {
+        switch (sortConfig.key) {
+          case "title":
+            return b.title || "";
+          case "location":
+            return b.location || "";
+          case "company":
+            return b.companyName || "";
+        }
+      })();
+      const result = String(valueA).localeCompare(String(valueB), undefined, { sensitivity: "base" });
+      return sortConfig.direction === "asc" ? result : -result;
+    });
+    return sorted;
+  }, [filteredPositions, sortConfig]);
+
+  const arrowStyle = (key: SortKey, direction: SortDirection): React.CSSProperties => ({
+    marginLeft: 6,
+    padding: "2px 6px",
+    fontSize: 11,
+    lineHeight: 1,
+    fontWeight: sortConfig?.key === key && sortConfig.direction === direction ? 700 : 400,
   });
 
   return (
@@ -66,19 +108,43 @@ export default function PositionListPage() {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Title</th>
-            <th>Location</th>
-            <th>Company</th>
+            <th>
+              Title
+              <button type="button" onClick={() => setSortConfig({ key: "title", direction: "asc" })} style={arrowStyle("title", "asc")}>
+                {"\u25B2"}
+              </button>
+              <button type="button" onClick={() => setSortConfig({ key: "title", direction: "desc" })} style={arrowStyle("title", "desc")}>
+                {"\u25BC"}
+              </button>
+            </th>
+            <th>
+              Location
+              <button type="button" onClick={() => setSortConfig({ key: "location", direction: "asc" })} style={arrowStyle("location", "asc")}>
+                {"\u25B2"}
+              </button>
+              <button type="button" onClick={() => setSortConfig({ key: "location", direction: "desc" })} style={arrowStyle("location", "desc")}>
+                {"\u25BC"}
+              </button>
+            </th>
+            <th>
+              Company
+              <button type="button" onClick={() => setSortConfig({ key: "company", direction: "asc" })} style={arrowStyle("company", "asc")}>
+                {"\u25B2"}
+              </button>
+              <button type="button" onClick={() => setSortConfig({ key: "company", direction: "desc" })} style={arrowStyle("company", "desc")}>
+                {"\u25BC"}
+              </button>
+            </th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {filteredPositions.length === 0 ? (
+          {sortedPositions.length === 0 ? (
             <tr>
               <td colSpan={5}>No positions found</td>
             </tr>
           ) : (
-            filteredPositions.map((pos) => (
+            sortedPositions.map((pos) => (
               <tr key={pos.id}>
                 <td>{pos.id}</td>
                 <td>{pos.title}</td>

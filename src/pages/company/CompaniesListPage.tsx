@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   getCompanies,
@@ -24,6 +24,7 @@ export default function CompaniesListPage() {
 
   // Local filter input for searching by company name (client-side filtering)
   const [filter, setFilter] = useState<string>("");
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc" | null>(null);
 
   // Result returned by remote search endpoint
   const [remoteCompany, setRemoteCompany] = useState<CompanyDto | null>(null);
@@ -130,6 +131,16 @@ export default function CompaniesListPage() {
     c.name.toLowerCase().includes(filter.toLowerCase())
   );
 
+  const sortedCompanies = useMemo(() => {
+    if (!sortDirection) return filteredCompanies;
+    return [...filteredCompanies].sort((a, b) => {
+      const result = (a.name || "").localeCompare(b.name || "", undefined, {
+        sensitivity: "base",
+      });
+      return sortDirection === "asc" ? result : -result;
+    });
+  }, [filteredCompanies, sortDirection]);
+
   /**
    * Remote search by company name (server-side).
    */
@@ -206,7 +217,23 @@ export default function CompaniesListPage() {
         >
           <thead>
             <tr style={{ backgroundColor: "#f4f4f4" }}>
-              <th style={{ border: "1px solid #ddd", padding: "8px" }}>Name</th>
+              <th style={{ border: "1px solid #ddd", padding: "8px" }}>
+                Name
+                <button
+                  type="button"
+                  onClick={() => setSortDirection("asc")}
+                  style={{ marginLeft: 6, padding: "2px 6px", fontSize: 11, fontWeight: sortDirection === "asc" ? 700 : 400 }}
+                >
+                  {"\u25B2"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setSortDirection("desc")}
+                  style={{ marginLeft: 4, padding: "2px 6px", fontSize: 11, fontWeight: sortDirection === "desc" ? 700 : 400 }}
+                >
+                  {"\u25BC"}
+                </button>
+              </th>
               <th style={{ border: "1px solid #ddd", padding: "8px" }}>Actions</th>
             </tr>
           </thead>
@@ -218,7 +245,7 @@ export default function CompaniesListPage() {
                 </td>
               </tr>
             ) : (
-              filteredCompanies.map((c) => (
+              sortedCompanies.map((c) => (
                 <tr key={c.id}>
                   <td style={{ border: "1px solid #ddd", padding: "8px" }}>
                     <Link to={`/companies/${c.id}`}>{c.name}</Link>
