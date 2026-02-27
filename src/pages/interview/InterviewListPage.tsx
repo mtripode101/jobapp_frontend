@@ -75,7 +75,6 @@ export default function InterviewListPage() {
       <h2 style={{ marginBottom: "16px" }}>📅 Interviews</h2>
 
       <div style={{ marginBottom: 16 }}>
-        <Link to="/" style={{ marginRight: 12 }}>🏠 Back to Home</Link>
         <Link to="/interviews/new">➕ Add Interview</Link>
       </div>
 

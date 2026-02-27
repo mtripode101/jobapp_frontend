@@ -146,7 +146,6 @@ export default function EditInterviewPage() {
   return (
     <div>
       <h2>Edit Interview</h2>
-      <Link to="/">🏠 Back to Home</Link> |{" "}
       <Link to="/interviews">📋 Interviews List</Link>
 
       {successMessage && <p style={{ color: "green" }}>{successMessage}</p>}

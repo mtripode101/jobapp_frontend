@@ -151,7 +151,6 @@ export default function CompaniesListPage() {
       <h2>Companies</h2>
 
       <div style={{ marginBottom: 12 }}>
-        <Link to="/">🏠 Back to Home</Link> |{" "}
         <Link to="/companies/new">➕ Add Company</Link>
       </div>
 

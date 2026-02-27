@@ -76,7 +76,6 @@ export default function InterviewFormPage() {
   return (
     <div>
       <h2>Add New Interview</h2>
-      <Link to="/">🏠 Back to Home</Link> |{" "}
       <Link to="/interviews">📋 Interviews List</Link>
 
       <form onSubmit={handleSubmit}>

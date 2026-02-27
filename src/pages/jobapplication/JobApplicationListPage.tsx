@@ -75,7 +75,6 @@ export default function JobApplicationListPage() {
     <div>
       <h2>Job Applications</h2>
 
-      <Link to="/">🏠 Back to Home</Link> |{" "}
       <Link to="/applications/new">➕ Create Application</Link>
 
       {/* 🔹 Filter controls */}
