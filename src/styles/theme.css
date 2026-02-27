@@ -1,0 +1,134 @@
+:root {
+  --font-ui: "Poppins", "Nunito Sans", "Trebuchet MS", sans-serif;
+
+  --bg-app: #eef3f8;
+  --bg-surface: #ffffff;
+  --bg-surface-soft: #f8fafc;
+  --bg-header: #0f172a;
+
+  --text-primary: #0f172a;
+  --text-muted: #475569;
+  --text-inverse: #ffffff;
+
+  --brand: #0ea5a4;
+  --brand-strong: #0f766e;
+  --danger: #dc2626;
+  --danger-strong: #b91c1c;
+
+  --border-soft: #dbe3ef;
+  --border-strong: #c7d3e3;
+  --shadow-soft: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --radius-md: 12px;
+  --radius-sm: 8px;
+}
+
+body {
+  font-family: var(--font-ui);
+  background: radial-gradient(circle at top right, #dff6f4 0%, var(--bg-app) 45%);
+  color: var(--text-primary);
+}
+
+.app-main > div {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-soft);
+  padding: 20px;
+  overflow-x: auto;
+}
+
+.app-main h2 {
+  margin-top: 0;
+  margin-bottom: 16px;
+  font-size: 1.5rem;
+  color: var(--text-primary);
+}
+
+.app-main a {
+  color: var(--brand-strong);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.app-main a:hover {
+  text-decoration: underline;
+}
+
+.app-main button,
+.app-main input,
+.app-main select,
+.app-main textarea {
+  font: inherit;
+}
+
+.app-main input,
+.app-main select,
+.app-main textarea {
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  background: #fff;
+  color: var(--text-primary);
+}
+
+.app-main button {
+  border: 1px solid transparent;
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  background: var(--brand);
+  color: var(--text-inverse);
+  cursor: pointer;
+  transition: background-color 0.15s ease-in-out;
+}
+
+.app-main button:hover:not(:disabled) {
+  background: var(--brand-strong);
+}
+
+.app-main button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.app-main table {
+  width: 100% !important;
+  border-collapse: collapse !important;
+  border: 1px solid var(--border-soft) !important;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--bg-surface);
+}
+
+.app-main thead tr {
+  background: var(--bg-surface-soft) !important;
+}
+
+.app-main th,
+.app-main td {
+  border-bottom: 1px solid var(--border-soft) !important;
+  border-left: none !important;
+  border-right: none !important;
+  padding: 10px !important;
+  text-align: left;
+}
+
+.app-main tbody tr:hover {
+  background: #f3f7fc;
+}
+
+.app-main p[role="alert"],
+.app-main div[role="alert"] {
+  color: var(--danger) !important;
+  font-weight: 600;
+}
+
+.app-main p[role="status"] {
+  color: #166534 !important;
+  font-weight: 600;
+}
+
+@media (max-width: 768px) {
+  .app-main > div {
+    padding: 14px;
+  }
+}
