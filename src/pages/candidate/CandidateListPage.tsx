@@ -68,7 +68,7 @@ export default function CandidateListPage() {
     <div>
       <h2>Candidates</h2>
       <div style={{ marginBottom: 12 }}>
-        <Link to="/">🏠 Back to Home</Link> | <Link to="/candidates/new">➕ Add Candidate</Link>
+        <Link to="/candidates/new">➕ Add Candidate</Link>
       </div>
 
       {loading && <p role="status">Loading candidates...</p>}

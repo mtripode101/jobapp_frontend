@@ -23,7 +23,6 @@ export default function PositionListPage() {
       <h2>Positions</h2>
 
       {/* 🔗 Navigation */}
-      <Link to="/">🏠 Back to Home</Link> |{" "}
       <Link to="/positions/new">➕ Create Position</Link>
 
       <table border={1} style={{ width: "100%", marginTop: "20px" }}>

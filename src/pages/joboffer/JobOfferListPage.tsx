@@ -169,7 +169,6 @@ export default function JobOfferListPage() {
     <div>
       <h2>Job Offers</h2>
 
-      <Link to="/">🏠 Back to Home</Link> |{" "}
       <Link to="/job-offers/new">➕ Create Offer</Link>
 
       {loading && <p>Loading job offers...</p>}
