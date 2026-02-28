@@ -5,3 +5,4 @@ metadata:
   namespace: jobapp
 data:
   API_URL: "/api"
+  API_UPSTREAM: "http://backend:8080"
