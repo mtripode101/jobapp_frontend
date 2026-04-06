@@ -1,3 +1,5 @@
+name: jobapp-frontend-dev
+
 services:
   frontend:
     build:

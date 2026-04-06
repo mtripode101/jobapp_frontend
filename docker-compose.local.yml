@@ -1,3 +1,5 @@
+name: jobapp-frontend-local
+
 services:
   frontend:
     build:
@@ -12,7 +14,9 @@ services:
       API_UPSTREAM: "http://jobapp-backend-local:8080"
     restart: unless-stopped
     networks:
-      - jobapp-net-local
+      jobapp-net-local:
+        aliases:
+          - jobapp-frontend-local
 
 networks:
   jobapp-net-local:
